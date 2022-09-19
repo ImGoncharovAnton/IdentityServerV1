@@ -2,6 +2,7 @@
 // See LICENSE in the project root for license information.
 
 
+using IdsTemp.Models.Diagnostics;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

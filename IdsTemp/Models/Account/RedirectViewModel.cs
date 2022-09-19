@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace IdsTemp.MainModule.Account
+namespace IdsTemp.Models.Account
 {
     public class RedirectViewModel: PageModel
     {

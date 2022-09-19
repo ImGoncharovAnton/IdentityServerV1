@@ -1,11 +1,21 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
+﻿using System.ComponentModel.DataAnnotations;
 
-
-namespace IdsTemp.MainModule.Account
+namespace IdsTemp.Models.Account
 {
-    public class LoginViewModel : LoginInputModel
+    public class RegisterViewModel
     {
+        [Required]
+        public string Username { get; set; }
+
+        [Required]
+        public string Email { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        [Required]
+        public string Password { get; set; }
+
+        public string ReturnUrl { get; set; }
+
         public bool AllowRememberLogin { get; set; } = true;
         public bool EnableLocalLogin { get; set; } = true;
 
@@ -14,5 +24,7 @@ namespace IdsTemp.MainModule.Account
 
         public bool IsExternalLoginOnly => EnableLocalLogin == false && ExternalProviders?.Count() == 1;
         public string ExternalLoginScheme => IsExternalLoginOnly ? ExternalProviders?.SingleOrDefault()?.AuthenticationScheme : null;
+
+
     }
 }

@@ -102,6 +102,7 @@ internal static class HostingExtensions
 
         app.UseRouting();
         app.UseIdentityServer();
+        app.UseAuthentication();
         app.UseAuthorization();
 
         //  Не уверен, надо ли

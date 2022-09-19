@@ -1,4 +1,5 @@
 using Duende.IdentityServer.Services;
+using IdsTemp.Models.Home;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,13 +1,9 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
-
-
 using System.Text;
 using System.Text.Json;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 
-namespace IdsTemp.MainModule.Diagnostics
+namespace IdsTemp.Models.Diagnostics
 {
     public class DiagnosticsViewModel
     {

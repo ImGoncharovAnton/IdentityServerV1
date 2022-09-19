@@ -9,6 +9,8 @@ using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Validation;
 using IdsTemp.MainModule.Consent;
+using IdsTemp.Models.Consent;
+using IdsTemp.Models.Device;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

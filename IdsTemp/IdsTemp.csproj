@@ -10,7 +10,7 @@
         <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.1.5" />
         <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.1.5" />
 
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.9" />
 
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.9" />
         <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
@@ -106,5 +106,11 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\jquery.validate.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\LICENSE.md" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="MainModule\Admin\ApiScopes" />
+      <Folder Include="MainModule\Admin\Clients" />
+      <Folder Include="MainModule\Admin\IdentityScopes" />
     </ItemGroup>
 </Project>
