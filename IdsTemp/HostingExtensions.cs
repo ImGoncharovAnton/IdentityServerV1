@@ -13,7 +13,7 @@ internal static class HostingExtensions
 {
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddRazorPages();
+        // builder.Services.AddRazorPages();
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         
@@ -73,8 +73,8 @@ internal static class HostingExtensions
         builder.Services.ConfigureApplicationCookie(config =>
         {
             config.Cookie.Name = "IdentityServer.Cookie";
-            config.LoginPath = "/Auth/Login";
-            config.LogoutPath = "/Auth/Logout";
+            // config.LoginPath = "/Auth/Login";
+            // config.LogoutPath = "/Auth/Logout";
         });
 
         builder.Services.AddControllersWithViews();
@@ -90,26 +90,30 @@ internal static class HostingExtensions
         {
             app.UseDeveloperExceptionPage();
         }
+        else
+        {
+            app.UseExceptionHandler("/Home/Error");
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts();
+        }
 
+        app.UseHttpsRedirection();
         app.UseStaticFiles();
+
         app.UseRouting();
         app.UseIdentityServer();
+        app.UseAuthentication();
         app.UseAuthorization();
 
-        app.UseStaticFiles(new StaticFileOptions
-        {
-            FileProvider = new PhysicalFileProvider(
-                Path.Combine(app.Environment.ContentRootPath, "Styles")),
-            RequestPath = "/styles"
-        });
-        
         //  Не уверен, надо ли
-        app.MapRazorPages()
-            .RequireAuthorization();
+        // app.MapRazorPages()
+        //     .RequireAuthorization();
 
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapDefaultControllerRoute();
+            endpoints.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
         });
         
         return app;
