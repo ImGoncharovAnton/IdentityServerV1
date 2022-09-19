@@ -1,0 +1,26 @@
+﻿@{
+    Layout = null;
+}
+
+Index admin panel
+
+<h2>
+    IdentityServer Admin Panel
+</h2>
+
+<div class="row">
+    <p>There are simple administrative pages.</p>
+</div>
+
+<div class="row">
+    <div class="list-group">
+        <a a href="@Url.Action("Index", "Clients")" class="list-group-item list-group-item-action">Clients</a>
+        <a a href="@Url.Action("Index", "IdentityScopes")" class="list-group-item list-group-item-action">Identity Scopes</a>
+        <a a href="@Url.Action("Index", "ApiScopes")" class="list-group-item list-group-item-action">API Scopes</a>
+    </div>
+</div>
+
+@*<li>
+    @Html.ActionLink("Product/Manage/About", "About", "Manage",
+        new { area = "Products" })
+</li>*@
