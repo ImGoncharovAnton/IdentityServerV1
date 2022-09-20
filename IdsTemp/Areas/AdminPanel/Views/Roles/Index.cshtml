@@ -1,0 +1,75 @@
+﻿@model RolesViewModel
+
+@{
+    ViewData["Title"] = "Roles";
+}
+
+<div class="roles-page">
+    <div class="row">
+        <h2>
+            Roles
+        </h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form class="row">
+                <div class="form-group">
+                    <input class="form-control" placeholder="Filter" id="filter" name="filter" type="text" value="@Model.Filter" autofocus/>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary">Search</button>
+                </div>
+
+                <div class="col">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">Cancel</a>
+                    <a href="@Url.Action("New")" class="btn btn-success">New</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                @foreach (var role in Model.Roles)
+                {
+                    <tr>
+                        <td>
+                            @role.Id
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@role.Id">@role.Name</a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Delete", new {role.Id})" class="btn btn-danger">Delete</a>
+                            @* @Html.ActionLink("Delete", "Delete", new { role.Id }) *@
+                        </td> 
+                    </tr>
+                }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="btn-group">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-dark">Back to Admin</a> 
+        </div>
+    </div>
+
+</div>
+
+@*<ul>
+    <li><a href="@Url.Action("Delete", new {role.id})">New</a></li>
+    <li><a href="@Url.Action("Edit")">Edit</a></li>
+</ul>*@
