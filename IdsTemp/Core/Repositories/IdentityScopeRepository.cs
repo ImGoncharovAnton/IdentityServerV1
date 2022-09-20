@@ -4,48 +4,47 @@ using Duende.IdentityServer.EntityFramework.Mappers;
 using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
 using Microsoft.EntityFrameworkCore;
-using ApiScope = Duende.IdentityServer.Models.ApiScope;
 
 namespace IdsTemp.Core.Repositories;
 
-public class ApiScopeRepository : IApiScopeRepository
+public class IdentityScopeRepository : IIdentityScopeRepository
 {
-
     private readonly ConfigurationDbContext _context;
 
-    public ApiScopeRepository(ConfigurationDbContext context)
+    public IdentityScopeRepository(ConfigurationDbContext context)
     {
         _context = context;
     }
-
-    public async Task<IEnumerable<ApiScopeSummaryModel>> GetAllAsync(string filter = null)
+    
+    public async Task<IEnumerable<IdentityScopeSummaryModel>> GetAllAsync(string filter = null)
     {
-        var query = _context.ApiScopes
-            .Include(x => x.UserClaims).AsQueryable();
-        
-        if (!String.IsNullOrWhiteSpace(filter))
+        var query = _context.IdentityResources
+            .Include(x => x.UserClaims)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filter))
         {
             query = query.Where(x => x.Name.Contains(filter) || x.DisplayName.Contains(filter));
         }
-        
-        var result = query.Select(x => new ApiScopeSummaryModel
+
+        var result = query.Select(x => new IdentityScopeSummaryModel
         {
             Name = x.Name,
             DisplayName = x.DisplayName
         });
-        
-        return await result.ToListAsync();
+
+        return await result.ToArrayAsync();
     }
-    
-    public async Task<ApiScopeModel> GetByIdAsync(string id)
+
+    public async Task<IdentityScopeModel> GetByIdAsync(string id)
     {
-        var scope = await _context.ApiScopes
+        var scope = await _context.IdentityResources
             .Include(x => x.UserClaims)
             .SingleOrDefaultAsync(x => x.Name == id);
 
         if (scope == null) return null;
 
-        return new ApiScopeModel
+        return new IdentityScopeModel
         {
             Name = scope.Name,
             DisplayName = scope.DisplayName,
@@ -54,10 +53,10 @@ public class ApiScopeRepository : IApiScopeRepository
                 : null,
         };
     }
-    
-    public async Task CreateAsync(ApiScopeModel model)
+
+    public async Task CreateAsync(IdentityScopeModel model)
     {
-        var apiScope = new ApiScope
+        var scope = new Duende.IdentityServer.Models.IdentityResource()
         {
             Name = model.Name,
             DisplayName = model.DisplayName?.Trim()
@@ -67,20 +66,20 @@ public class ApiScopeRepository : IApiScopeRepository
                      Enumerable.Empty<string>();
         if (claims.Any())
         {
-            apiScope.UserClaims = claims.ToList();
+            scope.UserClaims = claims.ToList();
         }
 
-        _context.ApiScopes.Add(apiScope.ToEntity());
+        _context.IdentityResources.Add(scope.ToEntity());
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(ApiScopeModel model)
+    public async Task UpdateAsync(IdentityScopeModel model)
     {
-        var scope = await _context.ApiScopes
+        var scope = await _context.IdentityResources
             .Include(x => x.UserClaims)
             .SingleOrDefaultAsync(x => x.Name == model.Name);
 
-        if (scope == null) throw new Exception("Invalid Api Scope");
+        if (scope == null) throw new Exception("Invalid Identity Scope");
 
         if (scope.DisplayName != model.DisplayName)
         {
@@ -101,7 +100,7 @@ public class ApiScopeRepository : IApiScopeRepository
 
         if (claimsToAdd.Any())
         {
-            scope.UserClaims.AddRange(claimsToAdd.Select(x => new ApiScopeClaim
+            scope.UserClaims.AddRange(claimsToAdd.Select(x => new IdentityResourceClaim
             {
                 Type = x,
             }));
@@ -109,14 +108,14 @@ public class ApiScopeRepository : IApiScopeRepository
 
         await _context.SaveChangesAsync();
     }
-    
+
     public async Task DeleteAsync(string id)
     {
-        var scope = await _context.ApiScopes.SingleOrDefaultAsync(x => x.Name == id);
+        var scope = await _context.IdentityResources.SingleOrDefaultAsync(x => x.Name == id);
 
-        if (scope == null) throw new Exception("Invalid Api Scope");
+        if (scope == null) throw new Exception("Invalid Identity Scope");
 
-        _context.ApiScopes.Remove(scope);
+        _context.IdentityResources.Remove(scope);
         await _context.SaveChangesAsync();
     }
 }
