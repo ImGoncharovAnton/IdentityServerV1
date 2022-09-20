@@ -1,4 +1,6 @@
 using Duende.IdentityServer;
+using IdsTemp.Core.IRepositories;
+using IdsTemp.Core.Repositories;
 using IdsTemp.Data;
 using IdsTemp.Extensions;
 using IdsTemp.Models;
@@ -78,6 +80,7 @@ internal static class HostingExtensions
         });
 
         builder.Services.AddControllersWithViews();
+        builder.Services.AddTransient<IApiScopeRepository, ApiScopeRepository>();
         
         return builder.Build();
     }
@@ -111,6 +114,9 @@ internal static class HostingExtensions
 
         app.UseEndpoints(endpoints =>
         {
+            endpoints.MapControllerRoute(
+                name: "MyArea",
+                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
             endpoints.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
