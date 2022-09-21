@@ -10,5 +10,4 @@ public interface IRoleRepository
     Task<IdentityResult> CreateRoleAsync(string name);
     Task<IdentityResult> UpdateRoleAsync(string id, RoleModel model);
     Task<bool> DeleteRole(string id);
-    Task<IdentityResult> AddUserToRole(string email, string roleName);
 }

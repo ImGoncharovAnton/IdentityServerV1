@@ -20,7 +20,7 @@ namespace IdsTemp.MainModule.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
@@ -33,7 +33,7 @@ namespace IdsTemp.MainModule.Controllers
             IEventService events,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            RoleManager<IdentityRole> roleInManager
+            RoleManager<ApplicationRole> roleInManager
             )
         {
             // if the TestUserStore is not in DI, then we'll just use the global users collection
@@ -249,7 +249,7 @@ namespace IdsTemp.MainModule.Controllers
                 {
                     if (!_roleManager.RoleExistsAsync("User").GetAwaiter().GetResult())
                     {
-                        var userRole = new IdentityRole
+                        var userRole = new ApplicationRole
                         {
                             Name = "User",
                             NormalizedName = "User",
