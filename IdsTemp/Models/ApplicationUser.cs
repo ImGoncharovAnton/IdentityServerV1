@@ -6,5 +6,6 @@ namespace IdsTemp.Models
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public ICollection<ApplicationUserRole> UserRoles { get; set; }
     }
 }

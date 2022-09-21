@@ -36,7 +36,7 @@ public class UserRepository: IUserRepository
             LastName = user.LastName,
             Email = user.Email,
             Phone = user.PhoneNumber,
-            Role = user.UserName
+            Role = user.UserRoles.Select(ur => ur.Role.Name).FirstOrDefault()
         });
         
         return await result.AsTracking().ToListAsync();
