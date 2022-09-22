@@ -9,15 +9,13 @@ namespace IdsTemp.Core.Repositories;
 
 public class RoleRepository: IRoleRepository
 {
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<ApplicationRole> _roleManager;
 
     public RoleRepository(
-        RoleManager<IdentityRole> roleManager, 
+        RoleManager<ApplicationRole> roleManager, 
         UserManager<ApplicationUser> userManager)
     {
         _roleManager = roleManager;
-        _userManager = userManager;
     }
 
 
@@ -56,6 +54,19 @@ public class RoleRepository: IRoleRepository
         }
     }
 
+    public async Task<string> GetRoleIdByName(string roleName)
+    {
+        var role = await _roleManager.FindByNameAsync(roleName);
+        if (role != null)
+        {
+            return role.Id;
+        }
+        else
+        {
+           throw new Exception("Role has not found");
+        }
+    }
+
     public async Task<IdentityResult> CreateRoleAsync(string name)
     {
         // Check is the role exist
@@ -63,7 +74,7 @@ public class RoleRepository: IRoleRepository
 
         if (!roleExist)
         {
-            var roleResult = await _roleManager.CreateAsync(new IdentityRole(name));
+            var roleResult = await _roleManager.CreateAsync(new ApplicationRole(name));
             
             if (roleResult.Succeeded)
             {
@@ -109,8 +120,5 @@ public class RoleRepository: IRoleRepository
 
     }
 
-    public async Task<IdentityResult> AddUserToRole(string email, string roleName)
-    {
-        throw new NotImplementedException();
-    }
+   
 }

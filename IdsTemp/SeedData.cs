@@ -25,13 +25,13 @@ public class SeedData
         EnsureConfigurationSeedData(configurationContext);
 
         var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
         
         if (roleMgr.FindByNameAsync("Admin").Result == null)
         {
-            roleMgr.CreateAsync(new IdentityRole("Admin")).GetAwaiter().GetResult();
-            roleMgr.CreateAsync(new IdentityRole("Manager")).GetAwaiter().GetResult();
-            roleMgr.CreateAsync(new IdentityRole("Customer")).GetAwaiter().GetResult();
+            roleMgr.CreateAsync(new ApplicationRole("Admin")).GetAwaiter().GetResult();
+            roleMgr.CreateAsync(new ApplicationRole("Manager")).GetAwaiter().GetResult();
+            roleMgr.CreateAsync(new ApplicationRole("Customer")).GetAwaiter().GetResult();
         }
         
         var admin = userMgr.FindByNameAsync("admin").Result;

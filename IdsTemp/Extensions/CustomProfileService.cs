@@ -12,11 +12,11 @@ public class CustomProfileService : IProfileService
 {
     private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole> _rolemanager;
+    private readonly RoleManager<ApplicationRole> _rolemanager;
 
     public CustomProfileService(
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> rolemanager,
+        RoleManager<ApplicationRole> rolemanager,
         IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory)
     {
         _userManager = userManager;
