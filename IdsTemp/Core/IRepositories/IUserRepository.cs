@@ -9,5 +9,6 @@ public interface IUserRepository
     Task<IEnumerable<UserModel>> GetAllUserAsync (string filter = null);
     Task<UserModel> GetUserAsync(string id);
     Task<IdentityResult> CreateUserAsync(UserCreateModel user);
-    Task<IdentityResult> EditUserAsync(string id, UserCreateModel model);
+    Task<IdentityResult> EditUserAsync(string id, UserEditModel model);
+    Task<bool> DeleteUser(string id);
 }

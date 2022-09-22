@@ -54,6 +54,19 @@ public class RoleRepository: IRoleRepository
         }
     }
 
+    public async Task<string> GetRoleIdByName(string roleName)
+    {
+        var role = await _roleManager.FindByNameAsync(roleName);
+        if (role != null)
+        {
+            return role.Id;
+        }
+        else
+        {
+           throw new Exception("Role has not found");
+        }
+    }
+
     public async Task<IdentityResult> CreateRoleAsync(string name)
     {
         // Check is the role exist

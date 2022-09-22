@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using IdentityModel;
 using IdsTemp.Core.IRepositories;
+using IdsTemp.Data;
 using IdsTemp.Models;
 using IdsTemp.Models.AdminPanel;
 using Microsoft.AspNetCore.Identity;
@@ -12,13 +13,16 @@ public class UserRepository : IUserRepository
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly ApplicationDbContext _context;
 
     public UserRepository(
         UserManager<ApplicationUser> userManager,
-        RoleManager<ApplicationRole> roleManager)
+        RoleManager<ApplicationRole> roleManager, 
+        ApplicationDbContext context)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _context = context;
     }
 
     public async Task<IEnumerable<UserModel>> GetAllUserAsync(string filter = null)
@@ -48,7 +52,10 @@ public class UserRepository : IUserRepository
 
     public async Task<UserModel> GetUserAsync(string id)
     {
-        var findUser = await _userManager.FindByIdAsync(id);
+        var findUser = await _context.Users
+            .Include(x => x.UserRoles)
+            .ThenInclude(x => x.Role)
+            .FirstOrDefaultAsync(x => x.Id == id);
         if (findUser == null)
             throw new Exception($"The user with id = {id} is not found");
 
@@ -96,7 +103,7 @@ public class UserRepository : IUserRepository
         throw new Exception($"The User {createModel.UserName} has not been added");
     }
 
-    public async Task<IdentityResult> EditUserAsync(string id, UserCreateModel model)
+    public async Task<IdentityResult> EditUserAsync(string id, UserEditModel model)
     {
         var findUser = await _userManager.FindByIdAsync(id);
         if (findUser == null)
@@ -120,10 +127,11 @@ public class UserRepository : IUserRepository
             await _userManager.AddToRoleAsync(findUser, findRole.Name);
 
 
-        // userClaims.Contains()
-        // await _userManager.RemoveClaimAsync(findUser, JwtClaimTypes.Role)
+        await _userManager.RemoveClaimsAsync(findUser, userClaims);
         await _userManager.AddClaimsAsync(findUser, new Claim[]
         {
+            new Claim(JwtClaimTypes.Name, findUser.UserName),
+            new Claim(JwtClaimTypes.Email, findUser.Email),
             new Claim(JwtClaimTypes.Role, findRole.Name)
         });
 
@@ -136,5 +144,17 @@ public class UserRepository : IUserRepository
         {
             throw new Exception("User has not been created");
         }
+    }
+
+    public async Task<bool> DeleteUser(string id)
+    {
+        var findUser = await _userManager.FindByIdAsync(id);
+        if (findUser != null)
+        {
+            await _userManager.DeleteAsync(findUser);
+            return true;
+        }
+
+        return false;
     }
 }

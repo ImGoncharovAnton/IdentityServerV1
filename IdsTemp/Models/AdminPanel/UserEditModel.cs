@@ -1,6 +1,9 @@
-﻿namespace IdsTemp.Models.AdminPanel;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-public class UserEditModel
+namespace IdsTemp.Models.AdminPanel;
+
+public class UserEditModel: UserModel
 {
-    
+    public IList<SelectListItem> RolesList { get; set; }
+    public string SelectedRoleId { get; set; }
 }

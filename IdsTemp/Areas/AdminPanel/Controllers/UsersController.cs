@@ -12,7 +12,7 @@ public class UsersController : Controller
     private readonly IRoleRepository _roleRepository;
 
     public UsersController(
-        IUserRepository userRepository, 
+        IUserRepository userRepository,
         IRoleRepository roleRepository)
     {
         _userRepository = userRepository;
@@ -22,29 +22,29 @@ public class UsersController : Controller
     public async Task<IActionResult> Index(string filter)
     {
         var users = await _userRepository.GetAllUserAsync(filter);
-        
+
         var usersVm = new UsersViewModel
         {
             Users = users
         };
         return View(usersVm);
     }
-    
+
     public async Task<IActionResult> New()
     {
         var roles = await _roleRepository.GetRolesAsync();
-        
+
         var selectListItem = roles.Select(x => new SelectListItem
         {
             Value = x.Id.ToString(),
             Text = x.Name
         }).ToList();
-        
+
         var createUserVm = new UserCreateModel
         {
             RolesList = selectListItem
         };
-        
+
         return View(createUserVm);
     }
 
@@ -63,7 +63,7 @@ public class UsersController : Controller
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            return NotFound();
         }
     }
 
@@ -73,20 +73,76 @@ public class UsersController : Controller
             return NotFound();
         try
         {
-            // var user = await _roleRepository
+            var user = await _userRepository.GetUserAsync(id);
+            var userRoleId = await _roleRepository.GetRoleIdByName(user.Role);
+            var roles = await _roleRepository.GetRolesAsync();
+
+            var selectListItem = roles.Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = x.Name
+            }).ToList();
+
+            var editUserVm = new UserEditModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Phone = user.Phone,
+                RolesList = selectListItem,
+                SelectedRoleId = userRoleId
+            };
+            return View(editUserVm);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception("Exception", e);
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(string id, UserEditModel model)
+    {
+        if (id != model.Id)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
+            await _userRepository.EditUserAsync(id, model);
+            return RedirectToAction(nameof(Index));
+        }
+
+        return View(model);
+    }
+
+    public async Task<IActionResult> Delete(string? id)
+    {
+        if (id == null)
+            return NotFound();
+
+        try
+        {
+            var user = await _userRepository.GetUserAsync(id);
+            return View(user);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             return NotFound();
         }
-       
-        
-        return View();
     }
-    
-    public IActionResult Delete()
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(string id)
     {
-        return View();
+        await _userRepository.DeleteUser(id);
+        return RedirectToAction(nameof(Index));
     }
 }

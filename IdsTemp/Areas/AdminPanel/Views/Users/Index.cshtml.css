@@ -1,0 +1,15 @@
+.users-tr-head th{
+    vertical-align: middle;
+}
+
+.user-container {
+    padding: 0 10px;
+    width: 100%;
+}
+
+.id-td-column {
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
