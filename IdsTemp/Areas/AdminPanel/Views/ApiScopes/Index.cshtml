@@ -1,4 +1,4 @@
-﻿@model IdsTemp.Models.AdminPanel.ApiScopeViewModel
+﻿@model ApiScopeViewModel
 
 @{
 }
@@ -21,8 +21,8 @@
                 </div>
 
                 <div class="col">
-                    <a asp-page="/Admin/Index" class="btn btn-secondary">Cancel</a>
-                    <a asp-page="/Admin/ApiScopes/New" class="btn btn-success">New</a>
+                    <a asp-action="Index" class="btn btn-secondary" asp-controller="Home" >Cancel</a>
+                    <a asp-action="New" class="btn btn-success">New</a>
                 </div>
             </form>
         </div>
@@ -43,7 +43,7 @@
                 {
                     <tr>
                         <td>
-                            <a asp-page="/Admin/ApiScopes/Edit" asp-route-id="@scope.Name">@scope.Name</a>
+                            <a asp-action="Edit" asp-route-id="@scope.Name">@scope.Name</a>
                         </td>
                         <td>@scope.DisplayName</td>
                     </tr>
@@ -55,9 +55,9 @@
     </div>
 </div>
 
-
+@*
 
 <ul>
     <li><a href="@Url.Action("New")">New</a></li>
     <li><a href="@Url.Action("Edit")">Edit</a></li>
-</ul>
+</ul>*@

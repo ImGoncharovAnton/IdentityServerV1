@@ -118,4 +118,11 @@
       <AdditionalFiles Include="Areas\AdminPanel\Views\Shared\_ValidationScriptsPartial.cshtml" />
       <AdditionalFiles Include="Areas\AdminPanel\Views\Shared\_ValidationSummary.cshtml" />
     </ItemGroup>
+
+    <ItemGroup>
+      <None Include="Areas\AdminPanel\Views\ApiScopes\Edit.cshtml" />
+      <None Include="Areas\AdminPanel\Views\ApiScopes\Index.cshtml" />
+      <None Include="Areas\AdminPanel\Views\ApiScopes\New.cshtml" />
+      <None Include="Areas\AdminPanel\Views\Clients\Index.cshtml" />
+    </ItemGroup>
 </Project>

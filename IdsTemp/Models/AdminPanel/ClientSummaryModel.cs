@@ -10,9 +10,3 @@ public class ClientSummaryModel
     [Required] 
     public Flow Flow { get; set; }
 }
-
-public enum Flow
-{
-    ClientCredentials,
-    CodeFlowWithPkce
-}

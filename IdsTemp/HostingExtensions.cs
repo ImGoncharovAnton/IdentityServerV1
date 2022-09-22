@@ -81,6 +81,8 @@ internal static class HostingExtensions
 
         builder.Services.AddControllersWithViews();
         builder.Services.AddTransient<IApiScopeRepository, ApiScopeRepository>();
+        builder.Services.AddTransient<IClientRepository, ClientRepository>();
+        builder.Services.AddTransient<IIdentityScopeRepository, IdentityScopeRepository>();
         builder.Services.AddTransient<IRoleRepository, RoleRepository>();
         builder.Services.AddTransient<IUserRepository, UserRepository>();
         
