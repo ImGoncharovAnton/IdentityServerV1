@@ -50,12 +50,13 @@ public class ClientRepository : IClientRepository
             .Include(x => x.AllowedScopes)
             .Include(x => x.RedirectUris)
             .Include(x => x.PostLogoutRedirectUris)
+            .Include(x => x.AllowedCorsOrigins)
             .Where(x => x.ClientId == id)
             .SingleOrDefaultAsync();
 
         if (client == null) return null;
 
-        return new ClientModel
+        var model = new ClientModel
         {
             ClientId = client.ClientId,
             Name = client.ClientName,
@@ -66,12 +67,23 @@ public class ClientRepository : IClientRepository
             AllowedScopes = client.AllowedScopes.Any()
                 ? client.AllowedScopes.Select(x => x.Scope).Aggregate((a, b) => $"{a} {b}")
                 : null,
-            RedirectUri = client.RedirectUris.Select(x => x.RedirectUri).SingleOrDefault(),
+            RedirectUri = client.RedirectUris.Any()
+            ? client.RedirectUris.Select(x => x.RedirectUri).Aggregate((a, b) => $"{a} {b}")
+            : null,
             PostLogoutRedirectUri =
                 client.PostLogoutRedirectUris.Select(x => x.PostLogoutRedirectUri).SingleOrDefault(),
             FrontChannelLogoutUri = client.FrontChannelLogoutUri,
             BackChannelLogoutUri = client.BackChannelLogoutUri,
+            RequirePkce = client.RequirePkce,
+            AllowAccessTokensViaBrowser = client.AllowAccessTokensViaBrowser,
+            AllowedCorsOrigins = client.AllowedCorsOrigins.Any()
+                ? client.AllowedCorsOrigins.Select(x => x.Origin).Aggregate((a, b) => $"{a} {b}")
+                : null,
+            RequireConsent = client.RequireConsent,
+            AccessTokenLifetime = client.AccessTokenLifetime,
         };
+
+        return model;
     }
 
     public async Task CreateAsync(CreateClientModel model)
@@ -103,6 +115,7 @@ public class ClientRepository : IClientRepository
             .Include(x => x.AllowedScopes)
             .Include(x => x.RedirectUris)
             .Include(x => x.PostLogoutRedirectUris)
+            .Include(x => x.AllowedCorsOrigins)
             .SingleOrDefaultAsync(x => x.ClientId == model.ClientId);
 
         if (client == null) throw new Exception("Invalid Client Id");
@@ -110,6 +123,40 @@ public class ClientRepository : IClientRepository
         if (client.ClientName != model.Name)
         {
             client.ClientName = model.Name?.Trim();
+        }
+
+
+        if (client.AllowAccessTokensViaBrowser != model.AllowAccessTokensViaBrowser)
+        {
+            client.AllowAccessTokensViaBrowser = model.AllowAccessTokensViaBrowser;
+        }
+
+        if (client.RequireConsent != model.RequireConsent)
+        {
+            client.RequireConsent = model.RequireConsent;
+        }
+        if (client.AccessTokenLifetime != model.AccessTokenLifetime)
+        {
+            client.AccessTokenLifetime = model.AccessTokenLifetime;
+        }
+
+        var cors = model.AllowedCorsOrigins.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
+       var currentCors = (client.AllowedCorsOrigins.Select(x => x.Origin) ?? Enumerable.Empty<string>()).ToArray();
+
+        var corsToAdd = cors.Except(currentCors).ToArray();
+        var corsToRemove = currentCors.Except(cors).ToArray();
+
+        if (corsToRemove.Any())
+        {
+            client.AllowedCorsOrigins.RemoveAll(x => corsToRemove.Contains(x.Origin));
+        }
+
+        if (corsToAdd.Any())
+        {
+            client.AllowedCorsOrigins.AddRange(corsToAdd.Select(x => new ClientCorsOrigin
+            {
+                Origin = x,
+            }));
         }
 
         var scopes = model.AllowedScopes.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
@@ -138,7 +185,7 @@ public class ClientRepository : IClientRepository
 
         if (flow == Flow.CodeFlowWithPkce)
         {
-            if (client.RedirectUris.SingleOrDefault()?.RedirectUri != model.RedirectUri)
+            if (client.RedirectUris.FirstOrDefault()?.RedirectUri != model.RedirectUri)
             {
                 client.RedirectUris.Clear();
                 if (model.RedirectUri != null)

@@ -27,13 +27,53 @@ public class ApiScopesController : Controller
         return View(apiScopesVm);
     }
 
-    public IActionResult Edit()
+    // EDIT
+    public async Task<IActionResult> Edit(string id)
     {
+        var InputModel = await _apiScopeRepository.GetByIdAsync(id);
+
+        if (InputModel == null)
+        {
+            return RedirectToAction("Index");
+        }
+        return View(InputModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(ApiScopeModel model, string button)
+    {
+        if (button == "delete")
+        {
+            await _apiScopeRepository.DeleteAsync(model.Name);
+            return RedirectToAction("Index");
+        }
+
+        if (ModelState.IsValid)
+        {
+            await _apiScopeRepository.UpdateAsync(model);
+            return RedirectToAction("Index");
+        }
+
         return View();
     }
 
+    // NEW
     public IActionResult New()
     {
+        var inputModel = new ApiScopeModel();
+        return View(inputModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> New(ApiScopeModel model )
+    {
+        if (ModelState.IsValid)
+        {
+            await _apiScopeRepository.CreateAsync(model);
+
+            return RedirectToAction("Index", new { id = model.Name });
+        }
+
         return View();
     }
 }
