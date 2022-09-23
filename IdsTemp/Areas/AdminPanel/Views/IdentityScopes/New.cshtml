@@ -1,7 +1,7 @@
 ﻿
 @model IdentityScopeModel
 @{
-    ViewData["Title"] = "New";
+    ViewData["Title"] = "Identities | New";
 }
 
 <div class="clients-page">
@@ -12,24 +12,28 @@
     <div class="row">
         <div class="col-md-6">
             <form method="post" asp-action="New">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="Name" class="control-label"></label>
-                    <input class="form-control" asp-for="Name" autofocus />
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="Name" autofocus />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="DisplayName" class="control-label"></label>
-                    <input class="form-control" asp-for="DisplayName" />
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="DisplayName" />
                 </div>
                 <div class="form-group">
-                    <label asp-for="UserClaims">User Claims (space delimited)</label>
-                    <input class="form-control" asp-for="UserClaims" />
+                    <label asp-for="UserClaims" class="control-label">User Claims (space delimited)</label>
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="UserClaims" />
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-primary" type="submit">Save Changes</button>
-                    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+                    <button class="btn btn-primary" type="submit">Create</button>
+                    @*<a class="btn btn-secondary" asp-action="Index">Cancel</a>*@
                 </div>
             </form>
+        </div>
+        <div>
+            <a asp-action="Index">Back to List</a>
         </div>
     </div>
 </div>

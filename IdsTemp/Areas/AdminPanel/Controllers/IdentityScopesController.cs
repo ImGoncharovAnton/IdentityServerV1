@@ -80,7 +80,30 @@ public class IdentityScopesController : Controller
         return View();
     }
 
+    // DELETE
 
+    public async Task<IActionResult> Delete(string? id)
+    {
+        if (id == null)
+            return NotFound();
 
+        try
+        {
+            var identity = await _identityScopeRepository.GetByIdAsync(id);
+            return View(identity);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return NotFound();
+        }
+    }
 
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(string id)
+    {
+        await _identityScopeRepository.DeleteAsync(id);
+        return RedirectToAction(nameof(Index));
+    }
 }

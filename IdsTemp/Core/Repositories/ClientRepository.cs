@@ -188,16 +188,36 @@ public class ClientRepository : IClientRepository
                     }));
                 }
             }
-            
-            if (client.RedirectUris.FirstOrDefault()?.RedirectUri != model.RedirectUri)
+            //
+          /*  if (client.RedirectUris.FirstOrDefault()?.RedirectUri != model.RedirectUri)
             {
                 client.RedirectUris.Clear();
                 if (model.RedirectUri != null)
                 {
                     client.RedirectUris.Add(new ClientRedirectUri { RedirectUri = model.RedirectUri.Trim() });
                 }
+            }*/
+
+            var redirectUris = model.RedirectUri.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
+            var currentRedirectUris = (client.RedirectUris.Select(x => x.RedirectUri) ?? Enumerable.Empty<string>()).ToArray();
+
+            var redirectUrisToAdd = redirectUris.Except(currentRedirectUris).ToArray();
+            var redirectUrisToRemove = currentRedirectUris.Except(redirectUris).ToArray();
+
+            if (redirectUrisToRemove.Any())
+            {
+                client.RedirectUris.RemoveAll(x => redirectUrisToRemove.Contains(x.RedirectUri));
             }
 
+            if (redirectUrisToAdd.Any())
+            {
+                client.RedirectUris.AddRange(redirectUrisToAdd.Select(x => new ClientRedirectUri
+                {
+                    RedirectUri = x,
+                }));
+            }
+
+            //
             if (client.PostLogoutRedirectUris.FirstOrDefault()?.PostLogoutRedirectUri != model.PostLogoutRedirectUri)
             {
                 client.PostLogoutRedirectUris.Clear();

@@ -1,7 +1,7 @@
 ﻿
 @model IdentityScopeModel
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Identities | Edit";
 }
 
 <div class="identityscopes-page">
@@ -14,28 +14,30 @@
         <div class="col-md-6">
             <form method="post" asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="@Model.Name" />
+                <input type="hidden" asp-for="@Model.Name" class="form-control" />
 
                 <div class="form-group">
-                    <label asp-for="@Model.DisplayName"></label>
-                    <input class="form-control" asp-for="@Model.DisplayName" autofocus />
+                    <label asp-for="@Model.DisplayName" class="control-label"></label>
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.DisplayName" autofocus />
                 </div>
                 
                 <div class="form-group">
-                    <label asp-for="@Model.UserClaims">User Claims (space delimited)</label>
-                    <input class="form-control" asp-for="@Model.UserClaims" />
+                    <label asp-for="@Model.UserClaims" class="control-label">User Claims (space delimited)</label>
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.UserClaims" />
                 </div>
 
                 <div class="form-group">
                     <button class="btn btn-primary" type="submit">Save Changes</button>
-                    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
-                    <button class="btn btn-danger" type="submit" name="Button" value="delete">Delete</button>
+                    @*<a class="btn btn-secondary" asp-action="Index">Cancel</a>*@
+                    @*<button class="btn btn-danger" type="submit" name="Button" value="delete">Delete</button>*@
                 </div>
             </form>
 
         </div>
     </div>
-
+    <div>
+        <a class="btn btn-secondary" asp-action="Index">Back to List</a>
+    </div>
 </div>
 
 @section Scripts {

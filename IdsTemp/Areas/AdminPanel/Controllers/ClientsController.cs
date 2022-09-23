@@ -43,14 +43,8 @@ public class ClientsController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(ClientModel model, string button)
+    public async Task<IActionResult> Edit(ClientModel model)
     {
-        if (button == "delete")
-        {
-            await _clientRepository.DeleteAsync(model.ClientId);
-            return RedirectToAction("Index");
-        }
-
         if (ModelState.IsValid)
         {
             await _clientRepository.UpdateAsync(model);
@@ -81,5 +75,32 @@ public class ClientsController : Controller
         }
 
         return View(model);
+    }
+
+    // DELETE
+
+    public async Task<IActionResult> Delete(string? id)
+    {
+        if (id == null)
+            return NotFound();
+
+        try
+        {
+            var client = await _clientRepository.GetByIdAsync(id);
+            return View(client);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return NotFound();
+        }
+    }
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(string id)
+    {
+        await _clientRepository.DeleteAsync(id);
+        return RedirectToAction(nameof(Index));
     }
 }

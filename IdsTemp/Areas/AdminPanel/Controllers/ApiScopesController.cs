@@ -78,4 +78,32 @@ public class ApiScopesController : Controller
 
         return View();
     }
+
+    // DELETE
+
+    public async Task<IActionResult> Delete(string? id)
+    {
+        if (id == null)
+            return NotFound();
+
+        try
+        {
+            var scope = await _apiScopeRepository.GetByIdAsync(id);
+            return View(scope);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return NotFound();
+        }
+    }
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(string name)
+    {
+        await _apiScopeRepository.DeleteAsync(name);
+        return RedirectToAction(nameof(Index));
+    }
+
 }

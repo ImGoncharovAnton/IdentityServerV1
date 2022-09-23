@@ -1,6 +1,6 @@
 ﻿@model CreateClientModel
 @{
-    ViewData["Title"] = "New";
+    ViewData["Title"] = "Clients | New";
 }
 
 <div class="clients-page">
@@ -12,24 +12,25 @@
     <div class="row">
         <div class="col-md-6">
             <form method="post" asp-action="New">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="ClientId" class="control-label"></label>
-                    <input class="form-control" asp-for="ClientId" autofocus />
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="ClientId" autofocus />
                     <span asp-validation-for="ClientId" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Secret"></label>
-                    <input class="form-control" asp-for="Secret" />
+                    <label asp-for="Secret" class="control-label"></label>
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="Secret" />
                     <span asp-validation-for="Secret" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Name"></label>
-                    <input class="form-control" asp-for="Name" />
+                    <label asp-for="Name" class="control-label"></label>
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="Name" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Flow"></label>
+                    <label asp-for="Flow" class="control-label"></label>
                     <select class="form-control" asp-for="Flow">
                         <option value="0">Client Credentials</option>
                         <option value="1">Code Flow (with PKCE)</option>
@@ -37,9 +38,12 @@
                 </div>
                 <div class="form-group">
                     <button class="btn btn-primary" type="submit">Save Changes</button>
-                    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+                    @*<a class="btn btn-secondary" asp-action="Index">Back to List</a>*@
                 </div>
             </form>
+            <div>
+                <a class="btn btn-secondary" asp-action="Index">Back to List</a>
+            </div>
         </div>
     </div>
 </div>

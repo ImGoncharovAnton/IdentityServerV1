@@ -1,6 +1,6 @@
 ﻿@model ClientModel
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Client | Edit";
 }
 
 <div class="clients-page">
@@ -12,77 +12,76 @@
 
     <div class="row">
         <div class="col-md-6">
-            <form method="post"  asp-action="Edit">
+            <form method="post" asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="@Model.ClientId" />
-                <input type="hidden" asp-for="@Model.Flow" />
+                <input type="hidden" asp-for="@Model.Flow" class="form-control" />
 
                 <div class="form-group">
-                    <label asp-for="@Model.Name"></label>
-                    <input class="form-control" asp-for="@Model.Name" autofocus />
+                    <label asp-for="@Model.Name" class="control-label"></label>
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.Name" autofocus />
                     <span asp-validation-for="@Model.Name" class="text-danger"></span>
                 </div>
                 
-                @* TODO multiselect allowed scopes *@
                 <div class="form-group">
-                    <label asp-for="@Model.AllowedScopes">Allowed Scopes (space delimited)</label>
-                    <input class="form-control" asp-for="@Model.AllowedScopes" />
+                    <label asp-for="@Model.AllowedScopes" class="control-label">Allowed Scopes (space delimited)</label>
+                    <input class="form-control" minlength="4" maxlength="100" asp-for="@Model.AllowedScopes" />
                      <span asp-validation-for="@Model.AllowedScopes" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="@Model.AccessTokenLifetime"></label>
-                    <input input type="number" class="form-control" asp-for="@Model.AccessTokenLifetime" />
+                    <label asp-for="@Model.AccessTokenLifetime" class="control-label"></label>
+                    <input input type="number" minlength="3" maxlength="40" class="form-control" asp-for="@Model.AccessTokenLifetime" />
                 </div>
-
-
 
                  @if (Model.Flow == IdsTemp.Models.AdminPanel.Flow.CodeFlowWithPkce)
                 {
                     <div class="form-group">
-                        <label asp-for="@Model.RedirectUri">RedirectUri (space delimited)</label>
-                        <input class="form-control" asp-for="@Model.RedirectUri" />
+                        <label asp-for="@Model.RedirectUri" class="control-label">RedirectUri (space delimited)</label>
+                        <input class="form-control" minlength="4" maxlength="100" asp-for="@Model.RedirectUri" />
                     </div>
                     <div class="form-group">
-                        <label asp-for="@Model.PostLogoutRedirectUri"></label>
-                        <input class="form-control" asp-for="@Model.PostLogoutRedirectUri" />
+                        <label asp-for="@Model.PostLogoutRedirectUri" class="control-label"></label>
+                        <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.PostLogoutRedirectUri" />
                     </div>
                     <div class="form-group">
-                        <label asp-for="@Model.FrontChannelLogoutUri"></label>
-                        <input class="form-control" asp-for="@Model.FrontChannelLogoutUri" />
+                        <label asp-for="@Model.FrontChannelLogoutUri" class="control-label"></label>
+                        <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.FrontChannelLogoutUri" />
                     </div>
                     <div class="form-group">
-                        <label asp-for="@Model.BackChannelLogoutUri"></label>
-                        <input class="form-control" asp-for="@Model.BackChannelLogoutUri" />
+                        <label asp-for="@Model.BackChannelLogoutUri" class="control-label"></label>
+                        <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.BackChannelLogoutUri" />
                     </div>
                     <div class="form-group">
-                        <label asp-for="@Model.RequirePkce"></label>
+                        <label asp-for="@Model.RequirePkce" class="control-label"></label>
                         <input type="checkbox" role="switch" class="form-control" asp-for="@Model.RequirePkce" />
                     </div>
                         <div class="form-group">
-                        <label asp-for="@Model.AllowAccessTokensViaBrowser"></label>
+                        <label asp-for="@Model.AllowAccessTokensViaBrowser" class="control-label"></label>
                         <input type="checkbox" role="switch" class="form-control" asp-for="@Model.AllowAccessTokensViaBrowser" />
                     </div>
                         <div class="form-group">
-                        <label asp-for="@Model.RequireConsent"></label>
+                        <label asp-for="@Model.RequireConsent" class="control-label"></label>
                         <input type="checkbox" role="switch" class="form-control" asp-for="@Model.RequireConsent" />
                     </div>
                         <div class="form-group">
-                        <label asp-for="@Model.AllowedCorsOrigins">AllowedCorsOrigins (space delimited)</label>
-                        <input class="form-control" asp-for="@Model.AllowedCorsOrigins" />
+                        <label asp-for="@Model.AllowedCorsOrigins" class="control-label">AllowedCorsOrigins (space delimited)</label>
+                        <input class="form-control" minlength="4" maxlength="100" asp-for="@Model.AllowedCorsOrigins" />
                     </div>
                 }
 
                 <div class="form-group">
                     <button class="btn btn-primary" type="submit">Save Changes</button>
-                    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
-                    <button class="btn btn-danger" type="submit" name="Button" value="delete">Delete</button>
+                    @*<a class="btn btn-secondary" asp-action="Index">Cancel</a>*@
+                    @*<button class="btn btn-danger" type="submit" name="Button" value="delete">Delete</button>*@
                 </div>
             </form>
 
         </div>
     </div>
-
+    <div>
+        <a class="btn btn-secondary" asp-action="Index">Back to List</a>
+    </div>
 </div>
 
 @section Scripts {
