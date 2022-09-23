@@ -16,7 +16,7 @@ public class ClientRepository : IClientRepository
     {
         _context = context;
     }
-    
+
     public async Task<IEnumerable<ClientSummaryModel>> GetAllAsync(string filter = null)
     {
         var grants = new[] { GrantType.AuthorizationCode, GrantType.ClientCredentials };
@@ -68,8 +68,8 @@ public class ClientRepository : IClientRepository
                 ? client.AllowedScopes.Select(x => x.Scope).Aggregate((a, b) => $"{a} {b}")
                 : null,
             RedirectUri = client.RedirectUris.Any()
-            ? client.RedirectUris.Select(x => x.RedirectUri).Aggregate((a, b) => $"{a} {b}")
-            : null,
+                ? client.RedirectUris.Select(x => x.RedirectUri).Aggregate((a, b) => $"{a} {b}")
+                : null,
             PostLogoutRedirectUri =
                 client.PostLogoutRedirectUris.Select(x => x.PostLogoutRedirectUri).SingleOrDefault(),
             FrontChannelLogoutUri = client.FrontChannelLogoutUri,
@@ -125,40 +125,11 @@ public class ClientRepository : IClientRepository
             client.ClientName = model.Name?.Trim();
         }
 
-
-        if (client.AllowAccessTokensViaBrowser != model.AllowAccessTokensViaBrowser)
-        {
-            client.AllowAccessTokensViaBrowser = model.AllowAccessTokensViaBrowser;
-        }
-
-        if (client.RequireConsent != model.RequireConsent)
-        {
-            client.RequireConsent = model.RequireConsent;
-        }
         if (client.AccessTokenLifetime != model.AccessTokenLifetime)
         {
             client.AccessTokenLifetime = model.AccessTokenLifetime;
         }
-
-        var cors = model.AllowedCorsOrigins.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
-       var currentCors = (client.AllowedCorsOrigins.Select(x => x.Origin) ?? Enumerable.Empty<string>()).ToArray();
-
-        var corsToAdd = cors.Except(currentCors).ToArray();
-        var corsToRemove = currentCors.Except(cors).ToArray();
-
-        if (corsToRemove.Any())
-        {
-            client.AllowedCorsOrigins.RemoveAll(x => corsToRemove.Contains(x.Origin));
-        }
-
-        if (corsToAdd.Any())
-        {
-            client.AllowedCorsOrigins.AddRange(corsToAdd.Select(x => new ClientCorsOrigin
-            {
-                Origin = x,
-            }));
-        }
-
+        
         var scopes = model.AllowedScopes.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
         var currentScopes = (client.AllowedScopes.Select(x => x.Scope) ?? Enumerable.Empty<string>()).ToArray();
 
@@ -185,6 +156,39 @@ public class ClientRepository : IClientRepository
 
         if (flow == Flow.CodeFlowWithPkce)
         {
+            
+            if (client.AllowAccessTokensViaBrowser != model.AllowAccessTokensViaBrowser)
+            {
+                client.AllowAccessTokensViaBrowser = model.AllowAccessTokensViaBrowser;
+            }
+
+            if (client.RequireConsent != model.RequireConsent)
+            {
+                client.RequireConsent = model.RequireConsent;
+            }
+            
+            if (model.AllowedCorsOrigins != null)
+            {
+                var cors = model.AllowedCorsOrigins.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
+                var currentCors = (client.AllowedCorsOrigins.Select(x => x.Origin) ?? Enumerable.Empty<string>()).ToArray();
+
+                var corsToAdd = cors.Except(currentCors).ToArray();
+                var corsToRemove = currentCors.Except(cors).ToArray();
+
+                if (corsToRemove.Any())
+                {
+                    client.AllowedCorsOrigins.RemoveAll(x => corsToRemove.Contains(x.Origin));
+                }
+
+                if (corsToAdd.Any())
+                {
+                    client.AllowedCorsOrigins.AddRange(corsToAdd.Select(x => new ClientCorsOrigin
+                    {
+                        Origin = x,
+                    }));
+                }
+            }
+            
             if (client.RedirectUris.FirstOrDefault()?.RedirectUri != model.RedirectUri)
             {
                 client.RedirectUris.Clear();
@@ -194,7 +198,7 @@ public class ClientRepository : IClientRepository
                 }
             }
 
-            if (client.PostLogoutRedirectUris.SingleOrDefault()?.PostLogoutRedirectUri != model.PostLogoutRedirectUri)
+            if (client.PostLogoutRedirectUris.FirstOrDefault()?.PostLogoutRedirectUri != model.PostLogoutRedirectUri)
             {
                 client.PostLogoutRedirectUris.Clear();
                 if (model.PostLogoutRedirectUri != null)

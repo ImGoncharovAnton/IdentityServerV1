@@ -55,13 +55,13 @@ public class ClientsController : Controller
             return RedirectToAction("Index");
         }
 
-        return View();
+        return View(model);
     }
 
     // NEW
     public IActionResult New()
     {
-        var model = new ClientModel 
+        var model = new CreateClientModel 
         {
             Secret = Convert.ToBase64String(CryptoRandom.CreateRandomKey(16))
         };
@@ -69,7 +69,7 @@ public class ClientsController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> New(ClientModel model)
+    public async Task<IActionResult> New(CreateClientModel model)
     {
         if (ModelState.IsValid)
         {

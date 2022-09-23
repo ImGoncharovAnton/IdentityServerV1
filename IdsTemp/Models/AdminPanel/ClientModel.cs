@@ -3,23 +3,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace IdsTemp.Models.AdminPanel;
 
-public class ClientModel: CreateClientModel, IValidatableObject
+public class ClientModel
 {
+    public string ClientId { get; set; }
+    public string Name { get; set; }
+    public Flow Flow { get; set; }
     [Required]
-    public string? AllowedScopes { get; set; }
+    public string AllowedScopes { get; set; }
     public string? RedirectUri { get; set; }
     public string? PostLogoutRedirectUri { get; set; }
     public string? FrontChannelLogoutUri { get; set; }
     public string? BackChannelLogoutUri { get; set; }
-    //
     public bool RequirePkce { get; set; }
     public bool AllowAccessTokensViaBrowser { get; set; }
     public string? AllowedCorsOrigins { get; set; }
     public bool RequireConsent { get; set; }
     public int AccessTokenLifetime { get; set; }
-    //
+    
+    
+    // Надо думать зачем она нужна
 
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    /*public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var errors = new List<ValidationResult>();
 
@@ -30,5 +34,5 @@ public class ClientModel: CreateClientModel, IValidatableObject
         }
 
         return errors;
-    }
+    }*/
 }
