@@ -1,6 +1,6 @@
 ﻿@model ApiScopeModel
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "API Scopes | Edit";
 }
 
 <div class="identityscopes-page">
@@ -16,33 +16,33 @@
                 <input type="hidden" asp-for="@Model.Name" class="form-control" />
 
                  <div class="form-group">
-                    <label asp-for="@Model.Name"></label>
-                    <input class="form-control" asp-for="@Model.Name" autofocus />
+                    <label asp-for="@Model.Name" class="control-label"></label>
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.Name" autofocus />
                     <span asp-validation-for="@Model.Name" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="@Model.DisplayName"></label>
-                    <input class="form-control" asp-for="@Model.DisplayName" autofocus />
+                    <label asp-for="@Model.DisplayName" class="control-label"></label>
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.DisplayName" autofocus />
                     <span asp-validation-for="@Model.DisplayName" class="text-danger"></span>
                 </div>
                 
                 <div class="form-group">
-                    <label asp-for="@Model.UserClaims" >User Claims (space delimited)</label>
-                    <input class="form-control" asp-for="@Model.UserClaims" />
+                    <label  class="control-label" asp-for="@Model.UserClaims" >User Claims (space delimited)</label>
+                    <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.UserClaims" />
                 </div>
 
                 <div class="form-group">
                     <button class="btn btn-primary" type="submit">Save Changes</button>
-                    <a asp-action="Index" class="btn btn-secondary" asp-controller="Home" >Cancel</a>
-                    @*<a class="btn btn-secondary" asp-page="/Admin/ApiScopes/Index">Cancel</a>*@
-                    <button class="btn btn-danger" type="submit" name="Button" value="delete">Delete</button>
+                    @*<button class="btn btn-danger" type="submit" name="Button" value="delete">Delete</button>*@
                 </div>
             </form>
 
         </div>
     </div>
-
+    <div>
+        <a class="btn btn-secondary" asp-action="Index">Back to List</a>
+    </div>
 </div>
 
 @section Scripts {
