@@ -1,10 +1,12 @@
 ﻿using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace IdsTemp.Areas.AdminPanel.Controllers;
 
+[Authorize(Roles = "ISAdministrator")]
 [Area("AdminPanel")]
 public class UsersController : Controller
 {
@@ -59,7 +61,7 @@ public class UsersController : Controller
             await _userRepository.CreateUserAsync(createUser);
             return RedirectToAction("Index");
         }
-        // Добавить обработку и вывод ошибок
+
         catch (Exception e)
         {
             Console.WriteLine(e);

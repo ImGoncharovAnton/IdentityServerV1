@@ -18,6 +18,10 @@
             <span>@Model.ClientName</span> application.
         </div>
     }
+    else
+    {
+        <a asp-action="Login">Back to Login</a>
+    }
 
     @if (Model.SignOutIframeUrl != null)
     {

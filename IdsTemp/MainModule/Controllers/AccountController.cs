@@ -260,12 +260,12 @@ namespace IdsTemp.MainModule.Controllers
                     
                     await _userManager.AddToRoleAsync(user, "User");
 
-                    await _userManager.AddClaimsAsync(user, new Claim[]{
+                    /*await _userManager.AddClaimsAsync(user, new Claim[]{
                             new Claim(JwtClaimTypes.Name, model.Username),
                             new Claim(JwtClaimTypes.Email, model.Email),
                             new Claim(JwtClaimTypes.FamilyName, model.FirstName),
                             new Claim(JwtClaimTypes.GivenName, model.LastName),
-                            new Claim(JwtClaimTypes.Role,"User") });
+                            new Claim(JwtClaimTypes.Role,"User") });*/
 
                     var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
                     var loginresult = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, lockoutOnFailure: true);

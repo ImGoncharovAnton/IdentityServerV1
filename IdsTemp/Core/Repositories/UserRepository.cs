@@ -91,12 +91,10 @@ public class UserRepository : IUserRepository
             if (findRole != null)
             {
                 await _userManager.AddToRoleAsync(newUser, findRole.Name);
-                await _userManager.AddClaimsAsync(newUser, new Claim[]
+                /*await _userManager.AddClaimsAsync(newUser, new Claim[]
                 {
-                    new Claim(JwtClaimTypes.Name, newUser.UserName),
-                    new Claim(JwtClaimTypes.Email, newUser.Email),
                     new Claim(JwtClaimTypes.Role, findRole.Name)
-                });
+                });*/
                 return result;
             }
         } 
@@ -105,7 +103,10 @@ public class UserRepository : IUserRepository
 
     public async Task<IdentityResult> EditUserAsync(string id, UserEditModel model)
     {
-        var findUser = await _userManager.FindByIdAsync(id);
+        var findUser = await _context.Users
+            .Include(x => x.UserRoles)
+            .ThenInclude(x => x.Role)
+            .FirstOrDefaultAsync(x => x.Id == id);
         if (findUser == null)
             throw new Exception($"The user with {id} not found");
 
@@ -117,9 +118,16 @@ public class UserRepository : IUserRepository
         findUser.Email = model.Email;
         findUser.PhoneNumber = model.Phone;
 
-        var userRoles = await _userManager.GetRolesAsync(findUser);
+        var queryRoles = _context.UserRoles.AsQueryable();
+        var userRoles = queryRoles.Where(x => x.UserId == findUser.Id);
         if (userRoles.Any())
-            userRoles.Clear();
+        {
+
+            var listRoles = userRoles.Select(x => x.Role.Name).ToList();
+
+            await _userManager.RemoveFromRolesAsync(findUser, listRoles);
+            
+        }
 
 
         var findRole = await _roleManager.FindByIdAsync(model.SelectedRoleId);
@@ -128,12 +136,10 @@ public class UserRepository : IUserRepository
 
 
         await _userManager.RemoveClaimsAsync(findUser, userClaims);
-        await _userManager.AddClaimsAsync(findUser, new Claim[]
+        /*await _userManager.AddClaimsAsync(findUser, new Claim[]
         {
-            new Claim(JwtClaimTypes.Name, findUser.UserName),
-            new Claim(JwtClaimTypes.Email, findUser.Email),
             new Claim(JwtClaimTypes.Role, findRole.Name)
-        });
+        });*/
 
         var userResult = await _userManager.UpdateAsync(findUser);
         if (userResult.Succeeded)

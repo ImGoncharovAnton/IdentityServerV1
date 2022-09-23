@@ -1,9 +1,11 @@
 ﻿using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdsTemp.Areas.AdminPanel.Controllers;
 
+[Authorize(Roles = "ISAdministrator")]
 [Area("AdminPanel")]
 public class ApiScopesController : Controller
 {
