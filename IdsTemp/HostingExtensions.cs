@@ -132,6 +132,12 @@ internal static class HostingExtensions
         }
 
         app.UseHttpsRedirection();
+        app.UseCookiePolicy();
+        app.UseCors(o => o
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .SetIsOriginAllowed(origin => true)
+            .AllowCredentials());
         app.UseStaticFiles();
 
         app.UseRouting();
