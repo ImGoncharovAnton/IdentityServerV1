@@ -25,7 +25,7 @@
                 
                 <div class="form-group">
                     <label asp-for="@Model.AllowedScopes" class="control-label">Allowed Scopes (space delimited)</label>
-                    <input class="form-control" minlength="4" maxlength="100" asp-for="@Model.AllowedScopes" />
+                    <input class="form-control" minlength="4" maxlength="150" asp-for="@Model.AllowedScopes" />
                      <span asp-validation-for="@Model.AllowedScopes" class="text-danger"></span>
                 </div>
 
@@ -38,11 +38,11 @@
                 {
                     <div class="form-group">
                         <label asp-for="@Model.RedirectUri" class="control-label">RedirectUri (space delimited)</label>
-                        <input class="form-control" minlength="4" maxlength="100" asp-for="@Model.RedirectUri" />
+                        <input class="form-control" minlength="4" maxlength="150" asp-for="@Model.RedirectUri" />
                     </div>
                     <div class="form-group">
                         <label asp-for="@Model.PostLogoutRedirectUri" class="control-label"></label>
-                        <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.PostLogoutRedirectUri" />
+                        <input class="form-control" minlength="4" maxlength="60" asp-for="@Model.PostLogoutRedirectUri" />
                     </div>
                     <div class="form-group">
                         <label asp-for="@Model.FrontChannelLogoutUri" class="control-label"></label>
@@ -66,7 +66,7 @@
                     </div>
                         <div class="form-group">
                         <label asp-for="@Model.AllowedCorsOrigins" class="control-label">AllowedCorsOrigins (space delimited)</label>
-                        <input class="form-control" minlength="4" maxlength="100" asp-for="@Model.AllowedCorsOrigins" />
+                        <input class="form-control" minlength="4" maxlength="150" asp-for="@Model.AllowedCorsOrigins" />
                     </div>
                 }
 
