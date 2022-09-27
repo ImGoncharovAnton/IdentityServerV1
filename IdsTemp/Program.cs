@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Duende.IdentityServer.EntityFramework.DbContexts;
+using Duende.IdentityServer.EntityFramework.Mappers;
 using IdentityModel;
 using IdsTemp;
 using IdsTemp.Data;
@@ -32,7 +33,8 @@ try
     using var scope = app.Services.CreateScope();
 
     await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync();
-    await scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>().Database.MigrateAsync();
+    var configurationContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+    await configurationContext.Database.MigrateAsync();
     await scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.MigrateAsync();
 
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -71,6 +73,21 @@ try
         {
             throw new Exception(result.Errors.First().Description);
         }
+    }
+    
+    if (!configurationContext.IdentityResources.Any())
+    {
+        Log.Debug("IdentityResources being populated");
+        foreach (var resource in Config.IdentityResources.ToList())
+        {
+            configurationContext.IdentityResources.Add(resource.ToEntity());
+        }
+
+        configurationContext.SaveChanges();
+    }
+    else
+    {
+        Log.Debug("IdentityResources already populated");
     }
 
     // this seeding is only for the template to bootstrap the DB and users.
