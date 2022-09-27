@@ -1,5 +1,6 @@
 using System.Reflection;
 using Duende.IdentityServer;
+using Duende.IdentityServer.Extensions;
 using IdsTemp.Core.IRepositories;
 using IdsTemp.Core.Repositories;
 using IdsTemp.Data;
@@ -156,6 +157,14 @@ internal static class HostingExtensions
             endpoints.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+        });
+        
+        app.Use(async (ctx, next) =>
+        {
+            ctx.Request.Scheme = "https";
+            ctx.Request.Host = new HostString("identity-server-1.herokuapp.com");
+    
+            await next();
         });
         
         return app;
