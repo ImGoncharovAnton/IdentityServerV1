@@ -6,6 +6,7 @@ using IdsTemp.Core.Repositories;
 using IdsTemp.Data;
 using IdsTemp.Extensions;
 using IdsTemp.Models;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -166,6 +167,15 @@ internal static class HostingExtensions
     
             await next();
         });
+        var forwardOptions = new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+            RequireHeaderSymmetry = false
+        };
+
+        forwardOptions.KnownNetworks.Clear();
+        forwardOptions.KnownProxies.Clear();
+        app.UseForwardedHeaders(forwardOptions);
         
         return app;
     }
