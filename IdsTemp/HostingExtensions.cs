@@ -1,3 +1,4 @@
+using System.Reflection;
 using Duende.IdentityServer;
 using IdsTemp.Core.IRepositories;
 using IdsTemp.Core.Repositories;
@@ -7,6 +8,7 @@ using IdsTemp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using Serilog;
 
 namespace IdsTemp;
@@ -16,12 +18,39 @@ internal static class HostingExtensions
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
         // builder.Services.AddRazorPages();
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        string connStr;
 
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// Depending on if in development or production, use either Heroku-provided
+// connection string, or development connection string from env var.
+        if (env == "Development")
+        {
+            // Use connection string from file.
+            connStr = builder.Configuration.GetConnectionString("Identity");
+        }
+        else
+        {
+            // Use connection string provided at runtime by Heroku.
+            var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+            // Parse connection URL to connection string for Npgsql
+            connUrl = connUrl.Replace("postgres://", string.Empty);
+            var pgUserPass = connUrl.Split("@")[0];
+            var pgHostPortDb = connUrl.Split("@")[1];
+            var pgHostPort = pgHostPortDb.Split("/")[0];
+            var pgDb = pgHostPortDb.Split("/")[1];
+            var pgUser = pgUserPass.Split(":")[0];
+            var pgPass = pgUserPass.Split(":")[1];
+            var pgHost = pgHostPort.Split(":")[0];
+            var pgPort = pgHostPort.Split(":")[1];
+            connStr =
+                $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};sslmode=Require;TrustServerCertificate=True";
+        }
         
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
-
+        builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, dbContextOptionsBuilder) =>
+        {
+            dbContextOptionsBuilder.UseNpgsql(connStr, NpgsqlOptionsAction);
+        });
+        
         builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
@@ -40,18 +69,16 @@ internal static class HostingExtensions
             .AddConfigurationStore(options =>
             {
                 options.ConfigureDbContext = b =>
-                    b.UseSqlServer(connectionString,
-                        dbOpts => dbOpts.MigrationsAssembly(typeof(Program).Assembly.FullName));
+                    b.UseNpgsql(connStr, NpgsqlOptionsAction);
             })
             // this is something you will want in production to reduce load on and requests to the DB
-            //.AddConfigurationStoreCache()
+            .AddConfigurationStoreCache()
             //
             // this adds the operational data from DB (codes, tokens, consents)
             .AddOperationalStore(options =>
             {
                 options.ConfigureDbContext = b =>
-                    b.UseSqlServer(connectionString,
-                        dbOpts => dbOpts.MigrationsAssembly(typeof(Program).Assembly.FullName));
+                    b.UseNpgsql(connStr, NpgsqlOptionsAction);
 
                 // this enables automatic token cleanup. this is optional.
                 options.EnableTokenCleanup = true;
@@ -75,8 +102,6 @@ internal static class HostingExtensions
         builder.Services.ConfigureApplicationCookie(config =>
         {
             config.Cookie.Name = "IdentityServer.Cookie";
-            // config.LoginPath = "/Auth/Login";
-            // config.LogoutPath = "/Auth/Logout";
         });
 
         builder.Services.AddControllersWithViews();
@@ -85,6 +110,8 @@ internal static class HostingExtensions
         builder.Services.AddTransient<IIdentityScopeRepository, IdentityScopeRepository>();
         builder.Services.AddTransient<IRoleRepository, RoleRepository>();
         builder.Services.AddTransient<IUserRepository, UserRepository>();
+        
+        builder.Services.ConfigureNonBreakingSameSiteCookies();
         
         return builder.Build();
     }
@@ -126,5 +153,10 @@ internal static class HostingExtensions
         });
         
         return app;
+    }
+    
+    static void NpgsqlOptionsAction(NpgsqlDbContextOptionsBuilder npgsqlDbContextOptionsBuilder)
+    {
+        npgsqlDbContextOptionsBuilder.MigrationsAssembly(typeof(Program).GetTypeInfo().Assembly.GetName().Name);
     }
 }

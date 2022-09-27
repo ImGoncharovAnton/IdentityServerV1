@@ -1,4 +1,11 @@
-﻿using IdsTemp;
+﻿using System.Security.Claims;
+using Duende.IdentityServer.EntityFramework.DbContexts;
+using IdentityModel;
+using IdsTemp;
+using IdsTemp.Data;
+using IdsTemp.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -21,6 +28,50 @@ try
     var app = builder
         .ConfigureServices()
         .ConfigurePipeline();
+    
+    using var scope = app.Services.CreateScope();
+
+    await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync();
+    await scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>().Database.MigrateAsync();
+    await scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.MigrateAsync();
+
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+    
+    if (roleManager.FindByNameAsync("ISAdministrator").Result == null)
+    {
+        roleManager.CreateAsync(new ApplicationRole("ISAdministrator")).GetAwaiter().GetResult();
+    }
+    
+    var iSAdmin = userManager.FindByNameAsync("ISAdmin").Result;
+
+    if (iSAdmin == null)
+    {
+        iSAdmin = new ApplicationUser
+        {
+            UserName = "ISAdmin",
+            Email = "isadmin@example",
+            FirstName = "Identity",
+            LastName = "Admin"
+        };
+        var result = userManager.CreateAsync(iSAdmin, "PE30.zAq123").Result;
+        result = userManager.AddToRoleAsync(iSAdmin, "ISAdministrator").Result;
+        Log.Information("Done seeding isAdmin");
+        if (!result.Succeeded)
+        {
+            throw new Exception(result.Errors.First().Description);
+        }
+
+        result = userManager.AddClaimsAsync(iSAdmin, new Claim[]
+        {
+            new Claim(JwtClaimTypes.Role, "ISAdministrator")
+        }).Result;
+        if (!result.Succeeded)
+        {
+            throw new Exception(result.Errors.First().Description);
+        }
+    }
 
     // this seeding is only for the template to bootstrap the DB and users.
     // in production you will likely want a different approach.
