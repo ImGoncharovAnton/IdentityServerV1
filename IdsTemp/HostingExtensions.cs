@@ -67,6 +67,7 @@ internal static class HostingExtensions
 
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;
+                options.Authentication.CookieLifetime = TimeSpan.FromDays(2);
             })
             .AddConfigurationStore(options =>
             {
@@ -130,7 +131,7 @@ internal static class HostingExtensions
         {
             app.UseExceptionHandler("/Home/Error");
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            /*app.UseHsts();*/
+            app.UseHsts();
         }
 
         app.UseHttpsRedirection();
