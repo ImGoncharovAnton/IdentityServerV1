@@ -160,22 +160,20 @@ internal static class HostingExtensions
                 pattern: "{controller=Home}/{action=Index}/{id?}");
         });
         
-        app.Use(async (ctx, next) =>
+        /*app.Use(async (ctx, next) =>
         {
             ctx.Request.Scheme = "https";
             ctx.Request.Host = new HostString("identity-server-1.herokuapp.com");
     
             await next();
-        });
-        var forwardOptions = new ForwardedHeadersOptions
+        });*/
+        var forwardedHeadersOptions = new ForwardedHeadersOptions
         {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
-            RequireHeaderSymmetry = false,
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
         };
-
-        forwardOptions.KnownNetworks.Clear();
-        forwardOptions.KnownProxies.Clear();
-        app.UseForwardedHeaders(forwardOptions);
+        forwardedHeadersOptions.KnownNetworks.Clear();
+        forwardedHeadersOptions.KnownProxies.Clear();
+        app.UseForwardedHeaders(forwardedHeadersOptions);
         
         return app;
     }
