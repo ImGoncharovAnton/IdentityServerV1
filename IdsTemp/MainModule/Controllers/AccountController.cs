@@ -239,27 +239,32 @@ namespace IdsTemp.MainModule.Controllers
             var hasNotUpper = false;
             var hasNotLower = false;
             var hasNotDigit = false;
+
+            var countSymbol = 0;
+            var countUpper = 0;
+            var countLower = 0;
+            var countDigit = 0;
             
             foreach (char c in model.Password)
             {
-                if (!char.IsSymbol(c))
+                if (char.IsSymbol(c))
                     hasNotSymbol = true;
-                if (!char.IsUpper(c))
+                if (char.IsUpper(c))
                     hasNotUpper = true;
-                if (!char.IsLower(c))
+                if (char.IsLower(c))
                     hasNotLower = true;
-                if (!char.IsDigit(c))
+                if (char.IsDigit(c))
                     hasNotDigit = true;
             }
             
-            if (hasNotSymbol)
+            if (!hasNotSymbol)
                 ModelState.AddModelError(String.Empty, "Password mush have at least one non alphanumeric character");
-            if (hasNotLower)
+            if (!hasNotLower)
                 ModelState.AddModelError(String.Empty, "Password mush have at least one lowercase ('a'-'z')");
-            if (hasNotUpper)
+            if (!hasNotUpper)
                 ModelState.AddModelError(String.Empty, "Password mush have at least one uppercase ('A'-'Z')");
-            if (hasNotDigit)
-                ModelState.AddModelError(String.Empty, "Password mush have at least one digit ('0'-'9'");
+            if (!hasNotDigit)
+                ModelState.AddModelError(String.Empty, "Password mush have at least one digit ('0'-'9')");
 
             #endregion
             
@@ -281,10 +286,15 @@ namespace IdsTemp.MainModule.Controllers
                     ModelState.AddModelError(String.Empty, "Email is already exist");
                     return View(model);
                 }
-                
-                
-                
-                
+
+                var existUserName = await _userManager.FindByNameAsync(model.Username);
+                if (existUserName != null)
+                {
+                    ModelState.AddModelError(String.Empty, "UserName is already exist");
+                    return View(model);
+                }
+
+
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
