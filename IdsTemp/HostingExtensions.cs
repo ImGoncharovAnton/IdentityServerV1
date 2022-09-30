@@ -94,23 +94,6 @@ internal static class HostingExtensions
             .AddAspNetIdentity<ApplicationUser>()
             .AddProfileService<CustomProfileService>();
 
-        // builder.Services.AddAuthentication()
-        //     .AddGoogle(options =>
-        //     {
-        //         options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-        //
-        //         // register your IdentityServer with Google at https://console.developers.google.com
-        //         // enable the Google+ API
-        //         // set the redirect URI to https://localhost:5001/signin-google
-        //         options.ClientId = "copy client ID from Google here";
-        //         options.ClientSecret = "copy client secret from Google here";
-        //     });
-
-        builder.Services.ConfigureApplicationCookie(config =>
-        {
-            config.Cookie.Name = "IdentityServer.Cookie";
-        });
-
         builder.Services.AddControllersWithViews();
         builder.Services.AddTransient<IApiScopeRepository, ApiScopeRepository>();
         builder.Services.AddTransient<IClientRepository, ClientRepository>();
@@ -139,7 +122,6 @@ internal static class HostingExtensions
         }
 
         app.UseHttpsRedirection();
-        app.UseCookiePolicy();
         app.UseCors(o => o
             .AllowAnyHeader()
             .AllowAnyMethod()

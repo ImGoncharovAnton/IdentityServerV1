@@ -17,7 +17,7 @@ using Microsoft.Extensions.Options;
 namespace IdsTemp.MainModule.Controllers
 {
     [Authorize]
-    [SecurityHeaders]
+    
     public class DeviceController : Controller
     {
         private readonly IDeviceFlowInteractionService _interaction;

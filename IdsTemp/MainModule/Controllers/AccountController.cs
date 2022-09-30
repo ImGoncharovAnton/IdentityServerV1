@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdsTemp.MainModule.Controllers
 {
-    [SecurityHeaders]
+    
     [AllowAnonymous]
     public class AccountController : Controller
     {

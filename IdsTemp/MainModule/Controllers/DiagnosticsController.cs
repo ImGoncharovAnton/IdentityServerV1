@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdsTemp.MainModule.Controllers
 {
-    [SecurityHeaders]
+   
     [Authorize]
     public class DiagnosticsController : Controller
     {
