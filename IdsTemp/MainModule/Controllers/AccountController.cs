@@ -232,6 +232,37 @@ namespace IdsTemp.MainModule.Controllers
             }
             
             ViewData["ReturnUrl"] = returnUrl;
+
+            #region PasswordValidation
+
+            var hasNotSymbol = false;
+            var hasNotUpper = false;
+            var hasNotLower = false;
+            var hasNotDigit = false;
+            
+            foreach (char c in model.Password)
+            {
+                if (!char.IsSymbol(c))
+                    hasNotSymbol = true;
+                if (!char.IsUpper(c))
+                    hasNotUpper = true;
+                if (!char.IsLower(c))
+                    hasNotLower = true;
+                if (!char.IsDigit(c))
+                    hasNotDigit = true;
+            }
+            
+            if (hasNotSymbol)
+                ModelState.AddModelError(String.Empty, "Password mush have at least one non alphanumeric character");
+            if (hasNotLower)
+                ModelState.AddModelError(String.Empty, "Password mush have at least one lowercase ('a'-'z')");
+            if (hasNotUpper)
+                ModelState.AddModelError(String.Empty, "Password mush have at least one uppercase ('A'-'Z')");
+            if (hasNotDigit)
+                ModelState.AddModelError(String.Empty, "Password mush have at least one digit ('0'-'9'");
+
+            #endregion
+            
             if (ModelState.IsValid)
             {
 
@@ -244,6 +275,16 @@ namespace IdsTemp.MainModule.Controllers
                     LastName = model.LastName
                 };
 
+                var existEmail = await _userManager.FindByEmailAsync(model.Email);
+                if (existEmail != null)
+                {
+                    ModelState.AddModelError(String.Empty, "Email is already exist");
+                    return View(model);
+                }
+                
+                
+                
+                
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -307,14 +348,24 @@ namespace IdsTemp.MainModule.Controllers
             }
 
             // If we got this far, something failed, redisplay form
+            
             return View(model);
         }
+        
+        /*[AcceptVerbs("Get", "Post")]
+        public async Task<IActionResult> CheckEmail(string email)
+        {
+            var existEmail = await _userManager.FindByEmailAsync(email);
+
+            return Json(existEmail == null);
+        }*/
+
         private async Task<RegisterViewModel> BuildRegisterViewModelAsync(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
             List<string> roles = new List<string>();
             roles.Add("Admin");
-            roles.Add("Customer");
+            roles.Add("User");
             ViewBag.message = roles;
             if (context?.IdP != null && await _schemeProvider.GetSchemeAsync(context.IdP) != null)
             {

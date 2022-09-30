@@ -16,7 +16,8 @@ public static class Config
     public static IEnumerable<ApiScope> ApiScopes =>
         new ApiScope[]
         {
-            new ApiScope("inventory", "Inventory")
+            new ApiScope("inventory", "Inventory"),
+            new ApiScope("companyApi")
         };
 
     public static IEnumerable<Client> Clients =>
@@ -37,26 +38,23 @@ public static class Config
             // interactive SPA angular
             new Client
             {
-                ClientName = "Angular-client",
+                ClientName = "Angular-Client",
                 ClientId = "angular-client",
-                ClientSecrets = { new Secret("7A622350-FB10-427C-BCC1-723253A4B3FD".Sha256())},
                 AllowedGrantTypes = GrantTypes.Code,
-                RedirectUris = new List<string> { "http://localhost:4200/signin-callback", "http://localhost:4200/assets/silent-callback.html" },
+                RedirectUris = new List<string>{ "http://localhost:4200/signin-callback", "http://localhost:4200/assets/silent-callback.html" },
                 RequirePkce = true,
                 AllowAccessTokensViaBrowser = true,
                 AllowedScopes =
                 {
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile,
-                    "inventory",
-                    JwtClaimTypes.Role
+                    "companyApi"
                 },
                 AllowedCorsOrigins = { "http://localhost:4200" },
                 RequireClientSecret = false,
-                AllowOfflineAccess = true,
                 PostLogoutRedirectUris = new List<string> { "http://localhost:4200/signout-callback" },
                 RequireConsent = false,
-                AccessTokenLifetime = 1800
+                AccessTokenLifetime = 120
             }
         };
 }

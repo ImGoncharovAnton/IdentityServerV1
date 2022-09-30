@@ -1,17 +1,25 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IdsTemp.Models.Account
 {
     public class RegisterViewModel
     {
         [Required]
+        [StringLength(150, ErrorMessage = "The first name field should have a maximum of 150 characters")]
+        [Display(Name = "Username")]
         public string Username { get; set; }
 
         [Required]
+        [DataType(DataType.EmailAddress)]
+        [Display(Name = "Email")]
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         [Required]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
         public string Password { get; set; }
 
         public string ReturnUrl { get; set; }

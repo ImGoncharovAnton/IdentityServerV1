@@ -1,6 +1,4 @@
 using System.Reflection;
-using Duende.IdentityServer;
-using Duende.IdentityServer.Extensions;
 using IdsTemp.Core.IRepositories;
 using IdsTemp.Core.Repositories;
 using IdsTemp.Data;
@@ -9,7 +7,6 @@ using IdsTemp.Models;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using Serilog;
 
@@ -53,7 +50,14 @@ internal static class HostingExtensions
             dbContextOptionsBuilder.UseNpgsql(connStr, NpgsqlOptionsAction);
         });
         
-        builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+        builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(opt =>
+            {
+                opt.Password.RequireDigit = true;
+                opt.Password.RequireLowercase = true;
+                opt.Password.RequireNonAlphanumeric = true;
+                opt.Password.RequireUppercase = true;
+                opt.Password.RequiredLength = 6;
+            })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
@@ -88,7 +92,7 @@ internal static class HostingExtensions
                 options.RemoveConsumedTokens = true;
             })
             .AddAspNetIdentity<ApplicationUser>()
-            .AddProfileService<CustomProfileService>();;
+            .AddProfileService<CustomProfileService>();
 
         // builder.Services.AddAuthentication()
         //     .AddGoogle(options =>
@@ -167,14 +171,6 @@ internal static class HostingExtensions
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
         });
-        
-        /*app.Use(async (ctx, next) =>
-        {
-            ctx.Request.Scheme = "https";
-            ctx.Request.Host = new HostString("identity-server-1.herokuapp.com");
-    
-            await next();
-        });*/
 
         return app;
     }
