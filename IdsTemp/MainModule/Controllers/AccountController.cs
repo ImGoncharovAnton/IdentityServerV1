@@ -240,14 +240,9 @@ namespace IdsTemp.MainModule.Controllers
             var hasNotLower = false;
             var hasNotDigit = false;
 
-            var countSymbol = 0;
-            var countUpper = 0;
-            var countLower = 0;
-            var countDigit = 0;
-            
             foreach (char c in model.Password)
             {
-                if (char.IsSymbol(c))
+                if (char.IsSymbol(c) || char.IsPunctuation(c))
                     hasNotSymbol = true;
                 if (char.IsUpper(c))
                     hasNotUpper = true;
