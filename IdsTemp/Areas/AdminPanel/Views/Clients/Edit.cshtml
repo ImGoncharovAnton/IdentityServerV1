@@ -3,87 +3,79 @@
     ViewData["Title"] = "Client | Edit";
 }
 
-<div class="clients-page">
-
-    <h2>
+<div class="admin-page">
+    <h2 class="common-heading">
         Edit Client Id: @Model.ClientId
         (<small>@Model.Flow</small>)
     </h2>
 
-    <div class="row">
-        <div class="col-md-6">
-            <form method="post" asp-action="Edit">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="@Model.ClientId" />
-                <input type="hidden" asp-for="@Model.Flow" class="form-control" />
+    <form method="post" asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="@Model.ClientId"/>
+        <input type="hidden" asp-for="@Model.Flow" class="form-control"/>
 
-                <div class="form-group">
-                    <label asp-for="@Model.Name" class="control-label"></label>
-                    <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.Name" autofocus />
-                    <span asp-validation-for="@Model.Name" class="text-danger"></span>
-                </div>
-                
-                <div class="form-group">
-                    <label asp-for="@Model.AllowedScopes" class="control-label">Allowed Scopes (space delimited)</label>
-                    <input class="form-control" minlength="4" maxlength="150" asp-for="@Model.AllowedScopes" />
-                     <span asp-validation-for="@Model.AllowedScopes" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="@Model.AccessTokenLifetime" class="control-label"></label>
-                    <input input type="number" minlength="3" maxlength="40" class="form-control" asp-for="@Model.AccessTokenLifetime" />
-                </div>
-
-                 @if (Model.Flow == IdsTemp.Models.AdminPanel.Flow.CodeFlowWithPkce)
-                {
-                    <div class="form-group">
-                        <label asp-for="@Model.RedirectUri" class="control-label">RedirectUri (space delimited)</label>
-                        <input class="form-control" minlength="4" maxlength="150" asp-for="@Model.RedirectUri" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="@Model.PostLogoutRedirectUri" class="control-label"></label>
-                        <input class="form-control" minlength="4" maxlength="60" asp-for="@Model.PostLogoutRedirectUri" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="@Model.FrontChannelLogoutUri" class="control-label"></label>
-                        <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.FrontChannelLogoutUri" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="@Model.BackChannelLogoutUri" class="control-label"></label>
-                        <input class="form-control" minlength="4" maxlength="40" asp-for="@Model.BackChannelLogoutUri" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="@Model.RequirePkce" class="control-label"></label>
-                        <input type="checkbox" role="switch" class="form-control" asp-for="@Model.RequirePkce" />
-                    </div>
-                        <div class="form-group">
-                        <label asp-for="@Model.AllowAccessTokensViaBrowser" class="control-label"></label>
-                        <input type="checkbox" role="switch" class="form-control" asp-for="@Model.AllowAccessTokensViaBrowser" />
-                    </div>
-                        <div class="form-group">
-                        <label asp-for="@Model.RequireConsent" class="control-label"></label>
-                        <input type="checkbox" role="switch" class="form-control" asp-for="@Model.RequireConsent" />
-                    </div>
-                        <div class="form-group">
-                        <label asp-for="@Model.AllowedCorsOrigins" class="control-label">AllowedCorsOrigins (space delimited)</label>
-                        <input class="form-control" minlength="4" maxlength="150" asp-for="@Model.AllowedCorsOrigins" />
-                    </div>
-                }
-
-                <div class="form-group">
-                    <button class="btn btn-primary" type="submit">Save Changes</button>
-                    @*<a class="btn btn-secondary" asp-action="Index">Cancel</a>*@
-                    @*<button class="btn btn-danger" type="submit" name="Button" value="delete">Delete</button>*@
-                </div>
-            </form>
-
+        <div class="form-group">
+            <label asp-for="@Model.Name" class="control-label"></label>
+            <input class="common-input" minlength="4" maxlength="40" asp-for="@Model.Name" autofocus/>
+            <span asp-validation-for="@Model.Name" class="text-danger"></span>
         </div>
-    </div>
-    <div>
-        <a class="btn btn-secondary" asp-action="Index">Back to List</a>
-    </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.AllowedScopes" class="control-label">Allowed Scopes (space delimited)</label>
+            <input class="common-input" minlength="4" maxlength="150" asp-for="@Model.AllowedScopes"/>
+            <span asp-validation-for="@Model.AllowedScopes" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="@Model.AccessTokenLifetime" class="control-label"></label>
+            <input input type="number" minlength="3" maxlength="40" class="common-input" asp-for="@Model.AccessTokenLifetime"/>
+        </div>
+
+        @if (Model.Flow == IdsTemp.Models.AdminPanel.Flow.CodeFlowWithPkce)
+        {
+            <div class="form-group">
+                <label asp-for="@Model.RedirectUri" class="control-label">RedirectUri (space delimited)</label>
+                <input class="common-input" minlength="4" maxlength="150" asp-for="@Model.RedirectUri"/>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PostLogoutRedirectUri" class="control-label"></label>
+                <input class="common-input" minlength="4" maxlength="60" asp-for="@Model.PostLogoutRedirectUri"/>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.FrontChannelLogoutUri" class="control-label"></label>
+                <input class="common-input" minlength="4" maxlength="40" asp-for="@Model.FrontChannelLogoutUri"/>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.BackChannelLogoutUri" class="control-label"></label>
+                <input class="common-input" minlength="4" maxlength="40" asp-for="@Model.BackChannelLogoutUri"/>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.RequirePkce" class="control-label"></label>
+                <input type="checkbox" role="switch" class="common-input" asp-for="@Model.RequirePkce"/>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.AllowAccessTokensViaBrowser" class="control-label"></label>
+                <input type="checkbox" role="switch" class="common-input" asp-for="@Model.AllowAccessTokensViaBrowser"/>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.RequireConsent" class="control-label"></label>
+                <input type="checkbox" role="switch" class="common-input" asp-for="@Model.RequireConsent"/>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.AllowedCorsOrigins" class="control-label">AllowedCorsOrigins (space delimited)</label>
+                <input class="common-input" minlength="4" maxlength="150" asp-for="@Model.AllowedCorsOrigins"/>
+            </div>
+        }
+
+        <div class="block-buttons flex-gap-1">
+            <button class="common-button flex-cc" type="submit">Save Changes</button>
+            <a class="common-button back-button flex-cc" asp-action="Index">Back to List</a>
+        </div>
+    </form>
+
 </div>
 
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

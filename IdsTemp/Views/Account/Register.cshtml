@@ -1,86 +1,65 @@
 ﻿@model IdsTemp.Models.Account.RegisterViewModel
-<partial name="_ValidationSummary" />
-<div class="login-page">
+<partial name="_ValidationSummary"/>
+<div class="auth-page">
 
-    <div  style="font-family: 'Montserrat', sans-serif; width:380px; height:630px; padding:35px; border-radius:10px; position:absolute; left:50%; top:60%; transform:translate(-50%, -50%); color:#F6F6F6; box-shadow: 0px 0px 20px rgba(42, 45, 51, 0.2);">
-        <div style="margin-top: 5px; margin-bottom: 30px; text-align:center;">
-            <h2 style="font-weight:700; font-size:24px; color: rgba(42, 45, 51, 0.8); margin-bottom: 5px">New account</h2>
+    <div class="auth-main-block">
+        <div class="heading-block">
+             <h2 class="auth-heading">New account</h2>
         </div>
-        <div>
-            <form asp-route="Login">
-                @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
-                @*<input type="hidden" asp-for="ReturnUrl"/>*@
-                <div style="margin-bottom: 30px">
-                    <input class="form-control input-validation-error" 
-                        placeholder="Login" 
-                        asp-for="Username" 
-                        autofocus 
-                        minlength="4" 
-                        maxlength="50"
-                        style="width:310px; height:50px; border: 1px solid #DADADA; border-radius:3px; color:#C6C6C6;"
-                    >
-                    <span asp-validation-for="Username" style="color:red; position:absolute; font-size: 12px; font-weight: 500;"></span>
-                </div>
-                <div style="margin-bottom: 30px">
-                    <input class="form-control input-validation-error" 
-                        placeholder="email" 
-                        asp-for="Email" 
-                        autofocus
-                        style="width:310px; height:50px; border: 1px solid #DADADA; border-radius:3px; color:#C6C6C6;"
-                    >
-                    <span asp-validation-for="Email" style="color:red; position:absolute; font-size: 12px; font-weight: 500;"></span>
-                </div>
-                <div style="margin-bottom: 30px">
-                    <input class="form-control" 
-                        placeholder="first name" 
-                        asp-for="FirstName" 
-                        autofocus
-                        style="width:310px; height:50px; border: 1px solid #DADADA; border-radius:3px; color:#C6C6C6;"
-                    >
-                </div>
-                <div style="margin-bottom: 30px">
-                    <input class="form-control" 
-                        placeholder="lastname" 
-                        asp-for="LastName" 
-                        autofocus
-                        style="width:310px; height:50px; border: 1px solid #DADADA; border-radius:3px; color:#C6C6C6;"
-                    >
-                </div>
-                <div style="margin-bottom: 30px">
-                    <input type="password"
-                        id="password"
-                        class="form-control input-validation-error" 
-                        placeholder="Password" 
-                        asp-for="Password" 
-                        autocomplete="off" 
-                        minlength="6" maxlength="40"
-                        style="width:310px; height:50px; border: 1px solid #DADADA; border-radius:3px; color:#C6C6C6;"
-                    >
-                    <i class="bi bi-eye-slash" 
-                        id="togglePassword"
-                        style="position:absolute;
-                            margin-left:280px;
-                            margin-top:-38px;
-                            cursor:pointer;
-                            color: #C6C6C6;"
-                    ></i>
-                    <span asp-validation-for="Password" style="color:red; position:absolute; font-size:12px; font-weight:500;"></span>
-                </div>  
-                <button name="button" value="Register"
+        <form asp-route="Register" class="auth-inputs-block">
+            @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+            @*<input type="hidden" asp-for="ReturnUrl"/>*@
+            <div class="auth-input-block">
+                <input class="input-validation-error common-input auth-input"
+                       placeholder="username"
+                       asp-for="Username"
+                       autofocus
+                       minlength="4"
+                       maxlength="50">
+                <span asp-validation-for="Username" class="auth-input-asp-validation"></span>
+            </div>
+            <div class="auth-input-block">
+                <input class="input-validation-error common-input auth-input"
+                       placeholder="email"
+                       asp-for="Email"
+                       autofocus>
+                <span asp-validation-for="Email" class="auth-input-asp-validation"></span>
+            </div>
+            <div class="auth-input-block">
+                <input class="common-input auth-input"
+                       placeholder="first name"
+                       asp-for="FirstName"
+                       autofocus>
+            </div>
+            <div class="auth-input-block">
+                <input class="common-input auth-input"
+                       placeholder="lastname"
+                       asp-for="LastName"
+                       autofocus>
+            </div>
+            <div class="auth-input-block">
+                <input type="password"
+                       id="password"
+                       class="input-validation-error common-input auth-input"
+                       placeholder="Password"
+                       asp-for="Password"
+                       autocomplete="off"
+                       minlength="6" maxlength="40">
+                <i class="bi bi-eye-slash auth-toggle-password"
+                   id="togglePassword">
+                </i>
+                <span asp-validation-for="Password" class="auth-input-asp-validation"></span>
+            </div>
+            <button name="button" value="Register"
                     type="submit" id="submit"
-                    style="color:#F6F6F6; background-color:#00B993; width: 310px; height: 50px; border: none; border-radius: 3px;font-weight: 500;font-size: 18px;"
-                >
-                    SIGN UP
-                </button>
-            </form>
-        </div>
-        <div style="text-align: center; margin-top: 20px">
-            <a href="@Url.Action("Login", new { Model.ReturnUrl })"
-                style="font-weight: 400;font-size: 14px;text-decoration-line: underline;color: #C6C6C6;"
-            >
-                Back to login
-            </a>
-        </div>
+                    class="auth-button">
+                SIGN UP
+            </button>
+        </form>
+        <a href="@Url.Action("Login", new { Model.ReturnUrl })"
+           class="auth-link">
+            Back to login
+        </a>
     </div>
 </div>
 <script>
@@ -100,7 +79,7 @@
         this.classList.toggle('bi-eye');
     });
 </script>
+
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
-

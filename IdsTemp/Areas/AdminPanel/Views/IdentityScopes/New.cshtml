@@ -1,43 +1,34 @@
-﻿
-@model IdentityScopeModel
+﻿@model IdentityScopeModel
 @{
     ViewData["Title"] = "Identities | New";
 }
 
-<div class="clients-page">
-    <h2>
-        New Identity Scope
-    </h2>
-
-    <div class="row">
-        <div class="col-md-6">
-            <form method="post" asp-action="New">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="Name" class="control-label"></label>
-                    <input class="form-control" minlength="4" maxlength="40" asp-for="Name" autofocus />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="DisplayName" class="control-label"></label>
-                    <input class="form-control" minlength="4" maxlength="40" asp-for="DisplayName" />
-                </div>
-                <div class="form-group">
-                    <label asp-for="UserClaims" class="control-label">User Claims (space delimited)</label>
-                    <input class="form-control" minlength="4" maxlength="40" asp-for="UserClaims" />
-                </div>
-                <div class="form-group">
-                    <button class="btn btn-primary" type="submit">Create</button>
-                    @*<a class="btn btn-secondary" asp-action="Index">Cancel</a>*@
-                </div>
-            </form>
+<div class="admin-page">
+    <h2 class="common-heading">New Client</h2>
+    
+    <form method="post" asp-action="New">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input class="common-input" minlength="4" maxlength="40" asp-for="Name" autofocus/>
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
-        <div>
-            <a asp-action="Index">Back to List</a>
+        <div class="form-group">
+            <label asp-for="DisplayName" class="control-label"></label>
+            <input class="common-input" minlength="4" maxlength="40" asp-for="DisplayName"/>
         </div>
-    </div>
+        <div class="form-group">
+            <label asp-for="UserClaims" class="control-label">User Claims (space delimited)</label>
+            <input class="common-input" minlength="4" maxlength="40" asp-for="UserClaims"/>
+        </div>
+        <div class="block-buttons flex-gap-1">
+            <button class="common-button flex-cc" type="submit">Save Changes</button>
+            <a class="common-button back-button flex-cc" asp-action="Index">Back to List</a>
+        </div>
+    </form>
 </div>
 
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

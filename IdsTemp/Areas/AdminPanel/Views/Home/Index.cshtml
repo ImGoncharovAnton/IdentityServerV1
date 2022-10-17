@@ -1,85 +1,83 @@
 ﻿@{
     ViewData["Title"] = "AdminPanel";
 }
-<h2 class="mb-4">IdentityServer Admin Panel</h2>
+<h2 class="common-heading">Admin Panel</h2>
 
 <!-- Cards -->
-<div class="card-deck mb-3 text-center">
+<div class="admin-cards">
     <!-- Clients -->
-    <div class="card mb-4 box-shadow">
-        <div class="card-header">
-            <h4 class="my-0 font-weight-normal">Clients</h4>
+    <div class="admin-card">
+        <div class="admin-card__header flex-cc">
+            <h3 class="admin-card__title flex-cc">Clients</h3>
         </div>
-        <div class="card-body">
-            <h1 class="card-title">
+        <div class="admin-card__body flex-cc">
+            <div class="admin-card__icon flex-cc">
                 <span class="bi bi-window-stack" title="Clients" aria-hidden="true"></span>
-            </h1>
-            <a href="@Url.Action("Index", "Clients")" class="btn btn-lg btn-block btn-primary">Manage</a>
+            </div>
+            <a href="@Url.Action("Index", "Clients")" class="auth-button flex-cc">Manage</a>
         </div>
     </div>
-<!-- Identity Resources -->
-    <div class="card mb-4 box-shadow">
-        <div class="card-header">
-            <h4 class="my-0 font-weight-normal">Identity Resources</h4>
+    <!-- Identity Resources -->
+    <div class="admin-card">
+        <div class="admin-card__header flex-cc">
+            <h3 class="admin-card__title">Identity Resources</h3>
         </div>
-        <div class="card-body">
-            <h1 class="card-title">
+        <div class="admin-card__body flex-cc">
+            <div class="admin-card__icon flex-cc">
                 <span class="bi bi-tags" title="Identity Resources" aria-hidden="true"></span>
-            </h1>
-            <a href="@Url.Action("Index", "IdentityScopes")" class="btn btn-lg btn-block btn-outline-primary">Manage</a>
+            </div>
+            <a href="@Url.Action("Index", "IdentityScopes")" class="auth-button flex-cc">Manage</a>
         </div>
     </div>
     <!-- Api Scopes -->
-    <div class="card mb-4 box-shadow">
-        <div class="card-header">
-            <h4 class="my-0 font-weight-normal">Api scopes</h4>
+    <div class="admin-card">
+        <div class="admin-card__header flex-cc">
+            <h3 class="admin-card__title">Api scopes</h3>
         </div>
-        <div class="card-body">
-            <h1 class="card-title">
+        <div class="admin-card__body flex-cc">
+            <div class="admin-card__icon flex-cc">
                 <span class="bi bi-wrench" title="Api Scopes" aria-hidden="true"></span>
-            </h1>
-           <a href="@Url.Action("Index", "ApiScopes")" class="btn btn-lg btn-block btn-primary">Manage</a>
+            </div>
+            <a href="@Url.Action("Index", "ApiScopes")" class="auth-button flex-cc">Manage</a>
         </div>
     </div>
-</div>
-@*  *@
 
-<div class="card-deck mb-3 text-center">
+
     <!-- Users -->
-    <div class="card mb-4 box-shadow">
-        <div class="card-header">
-            <h4 class="my-0 font-weight-normal">Users</h4>
+    <div class="admin-card">
+        <div class="admin-card__header flex-cc">
+            <h3 class="admin-card__title">Users</h3>
         </div>
-        <div class="card-body">
-            <h1 class="card-title">
+        <div class="admin-card__body flex-cc">
+            <div class="admin-card__icon flex-cc">
                 <span class="bi bi-people-fill" title="Users" aria-hidden="true"></span>
-            </h1>
-             <a href="@Url.Action("Index", "Users")" class="btn btn-lg btn-block btn-outline-primary">Manage</a>
+            </div>
+            <a href="@Url.Action("Index", "Users")" class="auth-button flex-cc">Manage</a>
         </div>
     </div>
     <!-- Roles -->
-    <div class="card mb-4 box-shadow">
-        <div class="card-header">
-            <h4 class="my-0 font-weight-normal">Roles</h4>
+    <div class="admin-card">
+        <div class="admin-card__header flex-cc">
+            <h3 class="admin-card__title">Roles</h3>
         </div>
-        <div class="card-body">
-            <h1 class="card-title">
+        <div class="admin-card__body flex-cc">
+            <div class="admin-card__icon flex-cc">
                 <span class="bi bi-key" title="Roles" aria-hidden="true"></span>
-            </h1>
-            <a href="@Url.Action("Index", "Roles")" class="btn btn-lg btn-block btn-primary">Manage</a>
+            </div>
+            <a href="@Url.Action("Index", "Roles")" class="auth-button flex-cc">Manage</a>
         </div>
     </div>
 
     <!-- Audit Logging -->
-    <div class="card mb-4 box-shadow">
-        <div class="card-header">
-            <h4 class="my-0 font-weight-normal">Autdit Logs</h4>
+    <div class="admin-card">
+        <div class="admin-card__header flex-cc">
+            <h3 class="admin-card__title">Audit Logs</h3>
         </div>
-        <div class="card-body">
-            <h1 class="card-title">
+        <div class="admin-card__body flex-cc">
+            <div class="admin-card__icon flex-cc">
                 <span class="bi bi-eye" title="Audit Logging" aria-hidden="true"></span>
-            </h1>
-            <button href="#" class="btn btn-lg btn-block btn-outline-primary disabled">Manage</button>
+            </div>
+            <button class="auth-button flex-cc" disabled>Manage</button>
         </div>
     </div>
 </div>

@@ -3,59 +3,46 @@
     ViewData["Title"] = "Clients";
 }
 
-<div class="clients-page">
-    <div class="row">
-        <h2>
-            Clients
-        </h2>
-    </div>
+<div class="admin-page">
+    <h2 class="common-heading">Clients</h2>
 
-    <div class="row">
-        <div class="col-md-6">
-            <form class="row">
-                <div class="form-group">
-                    <input class="form-control" placeholder="Filter" id="filter" name="filter" type="text" value="@Model.Filter" autofocus />
-                </div>
-                <div class="form-group ml-2">
-                    <button class="btn btn-primary">Search</button>
-                </div>
-
-                <div class="col">
-                    <a asp-action="Index" class="btn btn-dark mr-2 mb-3" asp-controller="Home">Cancel</a>
-                    <a asp-action="New" class="btn btn-success mb-3">New</a>
-                </div>
-            </form>
+    <form class="header-block flex-gap-1">
+        <div class="search-block flex-gap-1">
+             <input class="common-input" placeholder="Filter" id="filter" name="filter" type="text" value="@Model.Filter" autofocus/>
+             <button class="flex-cc common-button">Search</button>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col">
-            <table class="table table-striped table-sm table-responsive-lg">
-                <thead class="thead-dark">
-                    <tr class="users-tr-head">
-                        <th>Client ID</th>
-                        <th>Name</th>
-                        <th>Flow</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach(var client in Model.Clients)
-                    {
-                        <tr>
-                            <td>@client.Name</td>
-                            <td>@client.Name</td>
-                            <td>@client.Flow</td>
-                            <td class="flex justify-content-space-between">
-                                <a asp-action="Edit" asp-route-id="@client.ClientId" class="btn btn-info mr-1">Edit</a>
-                                <a asp-action="Delete" asp-route-id="@client.ClientId" class="btn btn-danger">Delete</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-
-            </table>
+        <div class="block-buttons flex-gap-1">
+            <a asp-action="Index" class="flex-cc common-button back-button" asp-controller="Home">Back</a>
+            <a asp-action="New" class="flex-cc common-button">New</a>
         </div>
-    </div>
+    </form>
+
+
+    <table class="table table-striped table-sm table-responsive-lg">
+        <thead class="thead-dark">
+        <tr class="users-tr-head">
+            <th>Client ID</th>
+            <th>Name</th>
+            <th>Flow</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        @foreach (var client in Model.Clients)
+        {
+            <tr>
+                <td>@client.Name</td>
+                <td>@client.Name</td>
+                <td>@client.Flow</td>
+                <td class="flex justify-content-space-between">
+                    <a asp-action="Edit" asp-route-id="@client.ClientId" class="btn btn-info mr-1">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@client.ClientId" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+
+    </table>
+
 </div>

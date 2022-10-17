@@ -1,54 +1,39 @@
 @model IdsTemp.Models.Account.LoginViewModel
+<partial name="_ValidationSummary"/>
+<div class="auth-page">
 
-<div class="login-page">
-   
-    <partial name="_ValidationSummary" />
+    @if (Model.EnableLocalLogin)
+    {
+        <div class="auth-main-block">
+            <div class="heading-block">
+                <h2 class="auth-heading">Welcome back</h2>
+                <span class="auth-description">Please enter your details</span>
+            </div>
+            <form asp-route="Login" class="auth-inputs-block">
+                @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+                <input type="hidden" asp-for="ReturnUrl"/>
 
-    <div>
-
-        @if (Model.EnableLocalLogin)
-        {
-            <div style="font-family: 'Montserrat', sans-serif; width:380px; height:438px; padding:35px; border-radius:10px; position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); color:#F6F6F6; box-shadow: 0px 0px 20px rgba(42, 45, 51, 0.2);">
-                <div style="margin-top: 17px; margin-bottom: 30px; text-align:center;">
-                    <h2 style="font-weight:700; font-size:24px; color: rgba(42, 45, 51, 0.8); margin-bottom: 5px">Welcome back</h2>
-                    <span style="font-weight:400; font-size:14px; color: #C6C6C6;">Please enter your details</span>
+                <div class="auth-input-block">
+                    <input class="input-validation-error common-input auth-input"
+                           placeholder="Email"
+                           asp-for="Username"
+                           autofocus minlength="4"
+                           maxlength="50">
+                    <span asp-validation-for="Username" class="auth-input-asp-validation"></span>
                 </div>
-
-                <div>
-                    <form asp-route="Login">
-                        @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
-                        <input type="hidden" asp-for="ReturnUrl" />
-
-                        <div style="margin-bottom: 30px">
-                            <input class="form-control input-validation-error" 
-                                placeholder="Email" 
-                                asp-for="Username" 
-                                autofocus minlength="4" 
-                                maxlength="50"
-                                style="width: 310px; height: 50px; border: 1px solid #DADADA; border-radius: 3px; color: #C6C6C6;"
-                            >
-                            <span asp-validation-for="Username" style="color:red; position:absolute; font-size: 12px; font-weight: 500;"></span>
-                        </div>
-                        <div style="margin-bottom: 30px">
-                            <input type="password" 
-                                placeholder="Password" 
-                                name="password" 
-                                id="password"
-                                class="form-control input-validation-error" 
-                                asp-for="Password" autocomplete="off"
-                                style="width: 310px; height: 50px; border: 1px solid #DADADA; border-radius: 3px; color: #C6C6C6;"
-                            >
-                            <i class="bi bi-eye-slash" 
-                                id="togglePassword"
-                                style="position:absolute;
-                                    margin-left:280px;
-                                    margin-top:-38px;
-                                    cursor:pointer;
-                                    color: #C6C6C6;"
-                            ></i>
-                            <span asp-validation-for="Password" style="color:red; position:absolute; font-size:12px; font-weight:500;"></span>
-                        </div>
-                      @*  @if (Model.AllowRememberLogin)
+                <div class="auth-input-block">
+                    <input type="password"
+                           placeholder="Password"
+                           name="password"
+                           id="password"
+                           class="input-validation-error common-input auth-input"
+                           asp-for="Password" autocomplete="off">
+                    <i class="bi bi-eye-slash auth-toggle-password"
+                       id="togglePassword">
+                    </i>
+                    <span asp-validation-for="Password" class="auth-input-asp-validation"></span>
+                </div>
+                @*  @if (Model.AllowRememberLogin)
                         {
                             <div class="form-group">
                                 <div class="form-check">
@@ -59,60 +44,55 @@
                                 </div>
                             </div>
                         }*@
-                        <button name="button" value="login"
-                                type="submit" id="submit"
-                                style="color:#F6F6F6; background-color:#00B993; width: 310px; height: 50px; border: none; border-radius: 3px;font-weight: 500;font-size: 18px;"
-                                >
-                                LOGIN
-                        </button>
-                    </form>
-                </div>
+                <button name="button" value="login"
+                        type="submit" id="submit"
+                        class="auth-button">
+                    LOGIN
+                </button>
+            </form>
 
-                <div style="text-align: center; margin-top: 20px">
-                    <a href="@Url.Action("Register",new {Model.ReturnUrl })"
-                        style="font-weight: 400;font-size: 14px;text-decoration-line: underline;color: #C6C6C6;"
-                    >
-                        Create account
-                    </a>
-                </div>
-            </div>
-        }
+            <a href="@Url.Action("Register", new { Model.ReturnUrl })"
+               class="auth-link">
+                Create account
+            </a>
+        </div>
+    }
 
-        @if (Model.VisibleExternalProviders.Any())
-        {
-            <div class="col-sm-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>External Account</h2>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-inline">
-                            @foreach (var provider in Model.VisibleExternalProviders)
-                            {
-                                <li class="list-inline-item">
-                                    <a class="btn btn-secondary"
-                                       asp-controller="External"
-                                       asp-action="Challenge"
-                                       asp-route-scheme="@provider.AuthenticationScheme"
-                                       asp-route-returnUrl="@Model.ReturnUrl">
-                                        @provider.DisplayName
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </div>
+    @if (Model.VisibleExternalProviders.Any())
+    {
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2>External Account</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-inline">
+                        @foreach (var provider in Model.VisibleExternalProviders)
+                        {
+                            <li class="list-inline-item">
+                                <a class="btn btn-secondary"
+                                   asp-controller="External"
+                                   asp-action="Challenge"
+                                   asp-route-scheme="@provider.AuthenticationScheme"
+                                   asp-route-returnUrl="@Model.ReturnUrl">
+                                    @provider.DisplayName
+                                </a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
-        }
+        </div>
+    }
 
-        @if (!Model.EnableLocalLogin && !Model.VisibleExternalProviders.Any())
-        {
-            <div class="alert alert-warning">
-                <strong>Invalid login request</strong>
-                There are no login schemes configured for this request.
-            </div>
-        }
-    </div>
+    @if (!Model.EnableLocalLogin && !Model.VisibleExternalProviders.Any())
+    {
+        <div class="alert alert-warning">
+            <strong>Invalid login request</strong>
+            There are no login schemes configured for this request.
+        </div>
+    }
+
 </div>
 <script>
     const togglePassword = document

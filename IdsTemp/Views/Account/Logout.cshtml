@@ -1,15 +1,13 @@
 @model IdsTemp.Models.Account.LogoutViewModel
 
-<div class="logout-page">
-    <div class="lead">
+<div class="logout-page flex-cc">
+    <div class="logout-header flex-cc">
         <h1>Logout</h1>
         <p>Would you like to logout of IdentityServer?</p>
     </div>
 
-    <form asp-action="Logout">
-        <input type="hidden" name="logoutId" value="@Model.LogoutId"  />
-        <div class="form-group">
-            <button class="btn btn-primary">Yes</button>
-        </div>
+    <form asp-action="Logout" class="logout-button flex-cc">
+        <input type="hidden" name="logoutId" value="@Model.LogoutId"/>
+        <button class="common-button flex-cc" style="width: 100%">Yes</button>
     </form>
 </div>

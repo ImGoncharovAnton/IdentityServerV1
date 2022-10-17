@@ -4,58 +4,54 @@
     ViewData["Title"] = "Users | New";
 }
 
-<h2>Create new User</h2>
+<div class="admin-page">
+    <h2 class="common-heading">Create new User</h2>
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="New">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" minlength="4" maxlength="40" autofocus/>
-                <span asp-validation-for="FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" minlength="4" maxlength="40" autofocus/>
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserName" class="control-label"></label>
-                <input asp-for="UserName" class="form-control" minlength="4" maxlength="40" autofocus/>
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input type="email" asp-for="Email" class="form-control" minlength="4" maxlength="40" autofocus/>
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Phone" class="control-label"></label>
-                <input type="tel" asp-for="Phone" class="form-control" minlength="10" maxlength="18" autofocus/>
-                <span asp-validation-for="Phone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input type="password" asp-for="Password" class="form-control" minlength="4" maxlength="40" autocomplete="off"/>
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RolesList" class="control-label"></label>
-                <select asp-for="@Model.SelectedRoleId" asp-items="@Model.RolesList" class="form-control">
-                </select>
-            </div>
-            <div class="form-group">
-                <button type="submit" value="New" class="btn btn-primary">Create</button>
-            </div>
-        </form>
-    </div>
-</div>
+    <form asp-action="New">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="FirstName" class="control-label"></label>
+            <input asp-for="FirstName" class="common-input" minlength="4" maxlength="40" autofocus/>
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="LastName" class="control-label"></label>
+            <input asp-for="LastName" class="common-input" minlength="4" maxlength="40" autofocus/>
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="UserName" class="control-label"></label>
+            <input asp-for="UserName" class="common-input" minlength="4" maxlength="40" autofocus/>
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Email" class="control-label"></label>
+            <input type="email" asp-for="Email" class="common-input" minlength="4" maxlength="40" autofocus/>
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Phone" class="control-label"></label>
+            <input type="tel" asp-for="Phone" class="common-input" minlength="10" maxlength="18" autofocus/>
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password" class="control-label"></label>
+            <input type="password" asp-for="Password" class="common-input" minlength="4" maxlength="40" autocomplete="off"/>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="RolesList" class="control-label"></label>
+            <select asp-for="@Model.SelectedRoleId" asp-items="@Model.RolesList" class="form-control">
+            </select>
+        </div>
+        <div class="block-buttons flex-gap-1">
+            <button class="common-button flex-cc" type="submit">Create</button>
+            <a class="common-button back-button flex-cc" asp-action="Index">Back to List</a>
+        </div>
+    </form>
 
-<div>
-    <a href="@Url.Action("Index")">Back to List</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
