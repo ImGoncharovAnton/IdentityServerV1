@@ -12,13 +12,16 @@ public class UsersController : Controller
 {
     private readonly IUserRepository _userRepository;
     private readonly IRoleRepository _roleRepository;
+    private readonly ILogger<UsersController> _logger;
 
     public UsersController(
         IUserRepository userRepository,
-        IRoleRepository roleRepository)
+        IRoleRepository roleRepository, 
+        ILogger<UsersController> logger)
     {
         _userRepository = userRepository;
         _roleRepository = roleRepository;
+        _logger = logger;
     }
 
     public async Task<IActionResult> Index(string filter)
@@ -58,12 +61,14 @@ public class UsersController : Controller
 
         try
         {
+            _logger.LogInformation("Create user is success!");
             await _userRepository.CreateUserAsync(createUser);
             return RedirectToAction("Index");
         }
 
         catch (Exception e)
         {
+            _logger.LogError("Create new user is failed", e);
             Console.WriteLine(e);
             return NotFound();
         }

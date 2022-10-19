@@ -12,11 +12,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
         : base(options)
     {
     }
+    
+    public virtual DbSet<LogEntity> logs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
+        builder.Entity<LogEntity>(logs =>
+        {
+            logs.HasNoKey();
+        });
+        
         builder.Entity<ApplicationUserRole>(userRole =>
         {
             userRole.HasKey(ur => new { ur.UserId, ur.RoleId });

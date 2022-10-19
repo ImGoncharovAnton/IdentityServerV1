@@ -8,6 +8,13 @@ using IdsTemp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Json;
+
+/*var configuration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json")
+    .Build();*/
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -15,15 +22,27 @@ Log.Logger = new LoggerConfiguration()
 
 Log.Information("Starting up");
 
+
 try
 {
     var builder = WebApplication.CreateBuilder(args);
-    builder.Host.UseSerilog((ctx, lc) => lc
+
+    var configuration = builder.Configuration;
+    
+    builder.Host.UseSerilog((ctx, services, lc) => lc
         .WriteTo.Console(
             outputTemplate:
             "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
+        .WriteTo.File(new JsonFormatter(), "log.txt")
+        .WriteTo.PostgreSQL(
+            connectionString: configuration.GetConnectionString("Identity"),
+            tableName: "Logs",
+            needAutoCreateTable: true,
+            useCopy: true
+        )
         .Enrich.FromLogContext()
-        .ReadFrom.Configuration(ctx.Configuration));
+        .ReadFrom.Configuration(ctx.Configuration)
+        .ReadFrom.Services(services));
 
     var app = builder
         .ConfigureServices()
