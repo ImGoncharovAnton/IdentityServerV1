@@ -1,45 +1,86 @@
-﻿using IdsTemp.Data;
-using IdsTemp.Models;
+﻿using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace IdsTemp.Areas.AdminPanel.Controllers;
 
 [Area("AdminPanel")]
 public class LogsController : Controller
 {
-    private readonly ApplicationDbContext _dbContext;
+    private readonly ILogsRepository _logsRepository;
 
-    public LogsController(ApplicationDbContext dbContext)
+    public LogsController(ILogsRepository logsRepository)
     {
-        _dbContext = dbContext;
+        _logsRepository = logsRepository;
     }
 
     // GET
-    public async Task<IActionResult> Index(int page = 1 )
+    public async Task<IActionResult> Index(string sortExpression="", string searchText = "", int pg = 1, int pageSize = 5)
     {
-        var logs = await _dbContext.logs.ToListAsync();
-
-        const int pageSize = 10;
-        if (page < 1)
-            page = 1;
-
-        var recsCount = logs.Count;
-        var paginator = new Paginator(recsCount, page, pageSize);
-        // if page not is 2 and page size is 10 then recskip = (2 - 1) * 10
-        var recSkip = (page - 1) * pageSize;
-        var data = logs.Skip(recSkip).Take(paginator.PageSize).ToList();
-
-        this.ViewBag.Paginator = paginator;
+        var sortModel = new SortModel();
         
+        sortModel.AddColumn("timestamp");
+        sortModel.AddColumn("level");
+        sortModel.ApplySort(sortExpression);
+        ViewData["sortModel"] = sortModel;
+        ViewBag.SearchText = searchText;
+        
+        
+        var logs = await _logsRepository.GetItemsAsync(sortModel.SortedProperty, sortModel.SortedOrder, searchText);
+
+        var paginator = new PaginatorModel(logs.Count, pg, pageSize);
+        paginator.SearchText = searchText;
+        paginator.SortExpression = sortExpression;
+        ViewBag.Paginator = paginator;
+
+        logs = logs.Skip((pg - 1) * pageSize).Take(pageSize).ToList();
         
         var vmLogs = new LogsViewModel
         {
-            Logs = data
+            Logs = logs
         };
       
         return View(vmLogs);
-        // return View(data);
+    }
+
+    private SortModel ApplySort(string sortExpression)
+    {
+        ViewData["SortParamTime"] = "timestamp";
+        ViewData["SortParamLevel"] = "level";
+        ViewData["SortIconTime"] = "";
+        ViewData["SortIconLevel"] = "";
+
+        var sortModel = new SortModel();
+
+        switch (sortExpression.ToLower())
+        {
+            case "timestamp_desc":
+                sortModel.SortedOrder = SortOrder.Descending;
+                sortModel.SortedProperty = "timestamp";
+                ViewData["SortIconTime"] = "bi bi-arrow-up";
+                ViewData["SortParamTime"] = "timestamp";
+                break;
+            case "level":
+                sortModel.SortedOrder = SortOrder.Ascending;
+                sortModel.SortedProperty = "level";
+                ViewData["SortIconLevel"] = "bi bi-arrow-down";
+                ViewData["SortParamLevel"] = "level_desc";
+                break;
+            case "level_desc":
+                sortModel.SortedOrder = SortOrder.Descending;
+                sortModel.SortedProperty = "level";
+                ViewData["SortIconLevel"] = "bi bi-arrow-up";
+                ViewData["SortParamLevel"] = "level";
+                break;
+            default:
+                sortModel.SortedOrder = SortOrder.Ascending;
+                sortModel.SortedProperty = "timestamp";
+                ViewData["SortIconTime"] = "bi bi-arrow-down";
+                ViewData["SortParamTime"] = "timestamp_desc";
+                break;
+        }
+
+        return sortModel;
     }
 }

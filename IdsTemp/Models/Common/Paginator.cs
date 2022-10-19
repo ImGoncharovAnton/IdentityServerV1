@@ -1,4 +1,4 @@
-﻿namespace IdsTemp.Models;
+﻿namespace IdsTemp.Models.Common;
 
 public class Paginator
 {
@@ -13,7 +13,7 @@ public class Paginator
 
     public Paginator(int totalItems, int page, int pageSize = 10)
     {
-        var totalPages = (int)Math.Ceiling((decimal)totalItems / (decimal)pageSize);
+        var totalPages = (int)Math.Ceiling(totalItems / (decimal)pageSize);
         var currentPage = page;
 
         var startPage = currentPage - 5;

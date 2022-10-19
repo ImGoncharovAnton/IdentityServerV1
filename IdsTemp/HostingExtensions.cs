@@ -100,17 +100,9 @@ internal static class HostingExtensions
         builder.Services.AddTransient<IIdentityScopeRepository, IdentityScopeRepository>();
         builder.Services.AddTransient<IRoleRepository, RoleRepository>();
         builder.Services.AddTransient<IUserRepository, UserRepository>();
-        builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        builder.Services.AddTransient<ILogsRepository, LogsRepository>();
         
         builder.Services.ConfigureNonBreakingSameSiteCookies();
-        builder.Services.AddWebOptimizer(pipeline =>
-        {
-            // pipeline.AddCssBundle("/css/app.css", new string[] { "css/site.css", "css/nano.min.css" });
-
-            pipeline.MinifyCssFiles();
-
-            pipeline.CompileScssFiles();
-        });
         
         return builder.Build();
     }
@@ -136,7 +128,6 @@ internal static class HostingExtensions
             .AllowAnyMethod()
             .SetIsOriginAllowed(origin => true)
             .AllowCredentials());
-        app.UseWebOptimizer();
         app.UseStaticFiles();
 
         app.UseRouting();
