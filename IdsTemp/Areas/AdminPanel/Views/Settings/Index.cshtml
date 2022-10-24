@@ -1,0 +1,16 @@
+﻿@model SettingsViewModel
+
+@{
+    ViewData["Title"] = "Settings";
+}
+
+
+<form asp-action="Index">
+    <div class="form-group">
+        <select asp-for="@Model.SelectedThemeId" asp-items="@Model.ThemesList" class="form-control">
+        </select>
+    </div>
+    <div class="block-buttons flex-gap-1">
+        <button class="common-button flex-cc" type="submit">Select Theme</button>
+    </div>
+</form>

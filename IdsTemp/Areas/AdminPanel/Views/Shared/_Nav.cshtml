@@ -34,6 +34,12 @@
                 </li>
             }
         </ul>
-
+        @if (User.IsInRole("ISAdministrator"))
+        {
+            <li class="nav-item flex-cc">
+                <i class="bi bi-gear"></i>
+                <a class="nav-link" asp-area="AdminPanel" asp-controller="Settings" asp-action="Index">Settings</a>
+            </li>
+        }
     </nav>
 </div>

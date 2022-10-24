@@ -47,6 +47,18 @@
     justify-content: center;
 }
 
+.auth-settings {
+    gap: 1rem;
+}
+
+.auth-settings i {
+    font-size: 1.2rem;
+}
+
+.auth-settings a {
+    padding: 0;
+}
+
 .auth-main-block {
     transform: translateY(25%);
     font-family: 'Montserrat', sans-serif;
@@ -94,7 +106,6 @@
 .auth-input {
     height: 50px;
 }
-
 
 .auth-input-asp-validation {
     color: red;

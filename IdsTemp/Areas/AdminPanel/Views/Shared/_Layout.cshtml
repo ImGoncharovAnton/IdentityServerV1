@@ -1,3 +1,6 @@
+@using Duende.IdentityServer.Extensions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IHttpContextAccessor _httpContextAccessor
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,9 +15,36 @@
     <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico"/>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/IdsTemp.styles.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    @{
+        var context = _httpContextAccessor.HttpContext?.Request;
+        var theme = context?.Cookies["currentTheme"]?.ToString();
+
+        if (theme.IsNullOrEmpty())
+        {
+            <link rel="stylesheet" href="~/css/themes/site.css" asp-append-version="true"/>
+        }
+        @*else
+        {
+            switch (theme)
+            {
+                case "green":
+                    <link rel="stylesheet" href="~/css/themes/green.css"/>
+                    break;
+                case "red":
+                    <link rel="stylesheet" href="~/css/themes/red.css"/>
+                    break;
+                case "blue":
+                    <link rel="stylesheet" href="~/css/themes/blue.css"/>
+                    break;
+            }
+        }*@
+
+    }
+    
+    @* <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/> *@
+    
+    @* <link rel="stylesheet" href="~/IdsTemp.styles.css" asp-append-version="true"/> *@
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"/>
 
 </head>
 <body>
@@ -24,9 +54,40 @@
     @RenderBody()
 </div>
 
+
+<div class="test">
+    <select name="theme" id="theme" onchange="changeTheme(this.options[this.selectedIndex].value)">
+        <option value="default">Default</option>
+        <option value="red">Red</option>
+        <option value="green">Green</option>
+        <option value="blue">Blue</option>
+    </select>
+</div>
+
 <script src="~/lib/jquery/dist/jquery.slim.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+    const changeTheme = (selectedTheme) => {
+        console.log(selectedTheme)
+        if (selectedTheme) {
+             document.cookie = "currentTheme=" + selectedTheme
+             window.location.reload();
+        }
+       
+    }
+    
+    
+    // $("#theme").on("change", function () {
+    //     var item = $("#theme option:selected").text();
+    //    
+    //     $.post("/AdminPanel/SetTheme", {
+    //         data: item
+    //     });
+    // });
+</script>
+
 @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
