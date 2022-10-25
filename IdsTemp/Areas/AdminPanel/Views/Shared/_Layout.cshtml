@@ -19,11 +19,11 @@
         var context = _httpContextAccessor.HttpContext?.Request;
         var theme = context?.Cookies["currentTheme"]?.ToString();
 
-        if (theme.IsNullOrEmpty())
+        if (theme.IsNullOrEmpty() || theme == "default")
         {
             <link rel="stylesheet" href="~/css/themes/site.css" asp-append-version="true"/>
         }
-        @*else
+        else
         {
             switch (theme)
             {
@@ -37,7 +37,7 @@
                     <link rel="stylesheet" href="~/css/themes/blue.css"/>
                     break;
             }
-        }*@
+        }
 
     }
     
@@ -50,42 +50,12 @@
 <body>
 <partial name="_Nav"/>
 
-<div class="container">
+<div class="auth-container">
     @RenderBody()
-</div>
-
-
-<div class="test">
-    <select name="theme" id="theme" onchange="changeTheme(this.options[this.selectedIndex].value)">
-        <option value="default">Default</option>
-        <option value="red">Red</option>
-        <option value="green">Green</option>
-        <option value="blue">Blue</option>
-    </select>
 </div>
 
 <script src="~/lib/jquery/dist/jquery.slim.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    const changeTheme = (selectedTheme) => {
-        console.log(selectedTheme)
-        if (selectedTheme) {
-             document.cookie = "currentTheme=" + selectedTheme
-             window.location.reload();
-        }
-       
-    }
-    
-    
-    // $("#theme").on("change", function () {
-    //     var item = $("#theme option:selected").text();
-    //    
-    //     $.post("/AdminPanel/SetTheme", {
-    //         data: item
-    //     });
-    // });
-</script>
 
 @await RenderSectionAsync("Scripts", required: false)
 

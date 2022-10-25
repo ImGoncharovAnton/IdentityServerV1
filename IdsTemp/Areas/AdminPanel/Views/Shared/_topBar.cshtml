@@ -2,23 +2,22 @@
 @model IdsTemp.Models.Common.PaginatorModel
 
 
-<div class="container btn-group" style="background-color: black; border-radius: 10px; height: 45px;">
+<div class="top-bar">
     <form class="header-block flex-gap-1">
         <div class="search-block flex-gap-1">
-            <input class="common-input" placeholder="Search" name="SearchText" type="text" value="@ViewBag.SearchText" autofocus/>
-            <button class="flex-cc common-button" type="submit">Search</button>
+            <input class="search-input" placeholder="Search" name="SearchText" type="text" value="@ViewBag.SearchText"/>
         </div>
         <div class="block-buttons flex-gap-1">
+            <button class="flex-cc common-button" type="submit">Search</button>
             <a asp-action="Index" class="flex-cc common-button back-button" asp-controller="Home">Back</a>
         </div>
     </form>
-    <div class="container mt-1">
-        <ul class="pagination justify-content-end">
+    <ul class="top-pagination">
 
             @if (Model.CurrentPage > 1)
             {
-                <li class="page-item">
-                    <a class="page-link" asp-action="@Model.Action"
+                <li class="top-pagination__item flex-cc">
+                    <a class="top-pagination__link" asp-action="@Model.Action"
                        asp-route-pg="1"
                        asp-route-pageSize="@Model.PageSize"
                        asp-route-searchText="@Model.SearchText"
@@ -26,8 +25,8 @@
                         First
                     </a>
                 </li>
-                <li class="page-item">
-                    <a class="page-link" asp-action="@Model.Action"
+                <li class="top-pagination__item flex-cc">
+                    <a class="top-pagination__link" asp-action="@Model.Action"
                        asp-route-pg="@(Model.CurrentPage - 1)"
                        asp-route-pageSize="@Model.PageSize"
                        asp-route-searchText="@Model.SearchText"
@@ -39,10 +38,10 @@
 
             @for (var pge = Model.StartPage; pge <= Model.EndPage; pge++)
             {
-                <li class="page-item @(pge == Model.CurrentPage ? "active" : "")">
+                <li class="top-pagination__item flex-cc @(pge == Model.CurrentPage ? "top-pagination__item_active" : "")">
                     @if (pge != Model.CurrentPage)
                     {
-                        <a class="page-link" asp-action="@Model.Action"
+                        <a class="top-pagination__link" asp-action="@Model.Action"
                            asp-route-pg="@pge"
                            asp-route-pageSize="@Model.PageSize"
                            asp-route-searchText="@Model.SearchText"
@@ -52,7 +51,7 @@
                     }
                     else
                     {
-                        <span class="page-link">@pge</span>
+                        <span class="top-pagination__link">@pge</span>
                     }
 
                 </li>
@@ -60,8 +59,8 @@
 
             @if (Model.CurrentPage < Model.TotalPages)
             {
-                <li class="page-item">
-                    <a class="page-link" asp-action="@Model.Action"
+                <li class="top-pagination__item flex-cc">
+                    <a class="top-pagination__link" asp-action="@Model.Action"
                        asp-route-pg="@(Model.CurrentPage + 1)"
                        asp-route-pageSize="@Model.PageSize"
                        asp-route-searchText="@Model.SearchText"
@@ -69,8 +68,8 @@
                         Next
                     </a>
                 </li>
-                <li class="page-item">
-                    <a class="page-link" asp-action="@Model.Action"
+                <li class="top-pagination__item flex-cc">
+                    <a class="top-pagination__link" asp-action="@Model.Action"
                        asp-route-pg="@(Model.TotalPages)"
                        asp-route-pageSize="@Model.PageSize"
                        asp-route-searchText="@Model.SearchText"
@@ -81,5 +80,4 @@
             }
 
         </ul>
-    </div>
 </div>

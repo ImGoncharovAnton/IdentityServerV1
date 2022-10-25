@@ -8,6 +8,8 @@ public class SortModel
     private const string DownIcon = "bi bi-arrow-down";
     public string SortedProperty { get; set; }
     public SortOrder SortedOrder { get; set; }
+    
+    public string SortedExpression { get; private set; }
     private List<SortableColumn> _sortableColumns = new List<SortableColumn>();
 
     public void AddColumn(string colName, bool isDefaultColumn = false)
@@ -33,10 +35,13 @@ public class SortModel
 
     public void ApplySort(string sortExpression)
     {
+        sortExpression ??= "";
+        
         if (sortExpression == "")
             sortExpression = SortedProperty;
 
         sortExpression = sortExpression.ToLower();
+        SortedExpression = sortExpression;
 
         foreach (var sortableColumn in _sortableColumns)
         {

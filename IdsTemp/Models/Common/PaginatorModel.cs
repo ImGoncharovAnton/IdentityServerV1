@@ -1,4 +1,6 @@
-﻿namespace IdsTemp.Models.Common;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace IdsTemp.Models.Common;
 
 public class PaginatorModel
 {
@@ -26,8 +28,8 @@ public class PaginatorModel
         var totalPages = (int)Math.Ceiling(totalItems / (decimal)pageSize);
         TotalPages = totalPages;
 
-        var startPage = currentPage - 5;
-        var endPage = currentPage + 4;
+        var startPage = currentPage;
+        var endPage = currentPage + 2;
 
         if (startPage <= 0)
         {
@@ -38,8 +40,8 @@ public class PaginatorModel
         if (endPage > totalPages)
         {
             endPage = totalPages;
-            if (endPage > 10)
-                startPage = endPage - 9;
+            if (endPage > 5)
+                startPage = endPage - 4;
         }
         
         StartRecord = (CurrentPage - 1) * PageSize + 1;
@@ -59,6 +61,27 @@ public class PaginatorModel
             StartPage = startPage;
             EndPage = endPage;
         }
+    }
+
+    public List<SelectListItem> GetPageSizes()
+    {
+        var pageSizes = new List<SelectListItem>();
+
+        pageSizes.Add(new SelectListItem("5", "5", true));
+        
+        for (int lp = 10; lp <= 100; lp += 10)
+        {
+            if (lp == this.PageSize)
+            {
+                pageSizes.Add(new SelectListItem(lp.ToString(), lp.ToString(), true));
+            }
+            else
+            {
+                pageSizes.Add(new SelectListItem(lp.ToString(), lp.ToString()));
+            }
+        }
+
+        return pageSizes;
     }
 
 }
