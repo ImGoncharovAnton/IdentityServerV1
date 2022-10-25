@@ -4,6 +4,7 @@ using IdsTemp.Core.IRepositories;
 using IdsTemp.Data;
 using IdsTemp.Models;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,18 +26,18 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<UserModel>> GetAllUserAsync(string filter = null)
+    public async Task<PaginatedList<UserModel>> GetAllUserAsync(string sortProperty, SortOrder sortOrder, string searchText="", int pageIndex = 1, int pageSize = 5)
     {
         var query = _userManager.Users.AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(filter))
+        if (!string.IsNullOrWhiteSpace(searchText))
         {
             query = query.Where(x =>
-                x.FirstName.Contains(filter) | x.LastName.Contains(filter) | x.UserName.Contains(filter) |
-                x.Email.Contains(filter));
+                x.FirstName.Contains(searchText) | x.LastName.Contains(searchText) | x.UserName.Contains(searchText) |
+                x.Email.Contains(searchText));
         }
 
-        var result = query.Select(user => new UserModel
+        var usersModel = query.Select(user => new UserModel
         {
             Id = user.Id,
             UserName = user.UserName,
@@ -47,7 +48,13 @@ public class UserRepository : IUserRepository
             Role = user.UserRoles.Select(ur => ur.Role.Name).FirstOrDefault()
         });
 
-        return await result.AsTracking().ToListAsync();
+        var users = await usersModel.ToListAsync();
+        
+        users = DoSort(users, sortProperty, sortOrder);
+        
+        var resUsers = new PaginatedList<UserModel>(users, pageIndex, pageSize);
+
+        return resUsers;
     }
 
     public async Task<UserModel> GetUserAsync(string id)
@@ -162,5 +169,33 @@ public class UserRepository : IUserRepository
         }
 
         return false;
+    }
+    
+    private List<UserModel> DoSort(List<UserModel> users, string sortProperty, SortOrder sortOrder)
+    {
+        if (sortProperty.ToLower() == "username")
+        {
+            if (sortOrder == SortOrder.Ascending)
+                users = users.OrderBy(u => u.UserName).ToList();
+            else
+                users = users.OrderByDescending(u => u.UserName).ToList();
+        }
+        else if (sortProperty.ToLower() == "email")
+        {
+            if (sortOrder == SortOrder.Ascending)
+                users = users.OrderBy(u => u.Email).ToList();
+            else
+                users = users.OrderByDescending(u => u.Email).ToList();
+        }
+        else
+        {
+            if (sortOrder == SortOrder.Ascending)
+                users = users.OrderBy(u => u.Role).ToList();
+            else
+                users = users.OrderByDescending(u => u.Role).ToList();
+        }
+
+        var result = users;
+        return result;
     }
 }

@@ -1,0 +1,37 @@
+﻿@model IdsTemp.Models.Common.PaginatorModel
+
+<div class="bottom-bar">
+    <div class="flex-cc">
+        Showing @Model.StartRecord to @Model.EndRecord of @Model.TotalItems Rows
+    </div>
+
+    <div class="flex-gap-1 flex-cc">
+        <span>
+            Rows Per Page
+        </span>
+        <span>
+            <select class="common-input flex-cc" id="pageSelector" asp-items="Model.GetPageSizes()" onchange="ChangePageSize(this)"></select>
+        </span>
+    </div>
+
+
+    <div class="flex-cc">
+        Showing @Model.CurrentPage / @Model.TotalPages
+    </div>
+</div>
+
+<script>
+    function ChangePageSize(obj) {
+        let actionName = "/"
+        let controllerName = '@this.ViewContext.RouteData.Values["controller"].ToString()';
+        let aliasName = '@this.ViewContext.RouteData.Values["area"].ToString()';
+        
+        
+        if ("@Model.Action" !== "Index") {
+            actionName = "/@Model.Action"
+        }
+        
+        window.location.href = "/" + aliasName +"/" + controllerName + actionName + "?pageSize=" + obj.value + "&SearchText=" + "@Model.SearchText" + "&sortExpression=" + "@Model.SortExpression";
+    }
+
+</script>

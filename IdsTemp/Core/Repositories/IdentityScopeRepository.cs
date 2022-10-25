@@ -3,6 +3,7 @@ using Duende.IdentityServer.EntityFramework.Entities;
 using Duende.IdentityServer.EntityFramework.Mappers;
 using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdsTemp.Core.Repositories;
@@ -16,24 +17,28 @@ public class IdentityScopeRepository : IIdentityScopeRepository
         _context = context;
     }
     
-    public async Task<IEnumerable<IdentityScopeSummaryModel>> GetAllAsync(string filter = null)
+    public async Task<PaginatedList<IdentityScopeSummaryModel>> GetAllAsync(string searchText="", int pageIndex = 1, int pageSize = 5)
     {
         var query = _context.IdentityResources
             .Include(x => x.UserClaims)
             .AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(filter))
+        if (!string.IsNullOrWhiteSpace(searchText))
         {
-            query = query.Where(x => x.Name.Contains(filter) || x.DisplayName.Contains(filter));
+            query = query.Where(x => x.Name.Contains(searchText) || x.DisplayName.Contains(searchText));
         }
 
-        var result = query.Select(x => new IdentityScopeSummaryModel
+        var identityScopesModel = query.Select(x => new IdentityScopeSummaryModel
         {
             Name = x.Name,
             DisplayName = x.DisplayName
         });
-
-        return await result.ToArrayAsync();
+        
+        var identityScopes = await identityScopesModel.ToListAsync();
+        
+        var resRoles = new PaginatedList<IdentityScopeSummaryModel>(identityScopes, pageIndex, pageSize);
+        
+        return resRoles;
     }
 
     public async Task<IdentityScopeModel> GetByIdAsync(string id)

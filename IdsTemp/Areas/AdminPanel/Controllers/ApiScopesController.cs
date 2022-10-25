@@ -1,5 +1,6 @@
 ﻿using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,10 +18,16 @@ public class ApiScopesController : Controller
     }
     
     // GET
-    public async Task<IActionResult> Index(string filter)
+    public async Task<IActionResult> Index(string searchText = "", int pg = 1, int pageSize = 5)
     {
+        ViewBag.SearchText = searchText;
         
-        var apiScopes = await _apiScopeRepository.GetAllAsync(filter);
+        var apiScopes = await _apiScopeRepository.GetAllAsync(searchText, pg, pageSize);
+        
+        var paginator = new PaginatorModel(apiScopes.TotalRecords, pg, pageSize);
+        paginator.SearchText = searchText;
+        ViewBag.Paginator = paginator;
+        
         var apiScopesVm = new ApiScopeViewModel
         {
             ApiScopes = apiScopes

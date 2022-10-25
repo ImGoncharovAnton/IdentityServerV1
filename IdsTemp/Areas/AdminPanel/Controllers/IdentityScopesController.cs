@@ -1,6 +1,7 @@
 ﻿using IdentityModel;
 using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,15 +19,22 @@ public class IdentityScopesController : Controller
     }
 
     // GET
-    public async Task<IActionResult> Index(string filter)
+    public async Task<IActionResult> Index(string searchText = "", int pg = 1, int pageSize = 5)
     {
-        var scopes = await _identityScopeRepository.GetAllAsync(filter);
-        var ScopesVm = new IdentityScopeViewModel
+        ViewBag.SearchText = searchText;
+        
+        var scopes = await _identityScopeRepository.GetAllAsync(searchText, pg, pageSize);
+       
+        var paginator = new PaginatorModel(scopes.TotalRecords, pg, pageSize);
+        paginator.SearchText = searchText;
+        ViewBag.Paginator = paginator;
+        
+        var scopesVm = new IdentityScopeViewModel
         {
             Scopes = scopes
         };
 
-        return View(ScopesVm);
+        return View(scopesVm);
     }
 
     //EDIT

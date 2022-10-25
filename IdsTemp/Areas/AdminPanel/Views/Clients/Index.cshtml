@@ -1,22 +1,14 @@
 ﻿@model ClientViewModel
 @{
     ViewData["Title"] = "Clients";
+
+    var paginator = ViewBag.Paginator;
 }
 
 <div class="admin-page">
     <h2 class="common-heading">Clients</h2>
 
-    <form class="header-block flex-gap-1">
-        <div class="search-block flex-gap-1">
-             <input class="common-input" placeholder="Filter" id="filter" name="filter" type="text" value="@Model.Filter" autofocus/>
-             <button class="flex-cc common-button">Search</button>
-        </div>
-        <div class="block-buttons flex-gap-1">
-            <a asp-action="Index" class="flex-cc common-button back-button" asp-controller="Home">Back</a>
-            <a asp-action="New" class="flex-cc common-button">New</a>
-        </div>
-    </form>
-
+    <partial name="_topBar" model="@paginator"/>
 
     <table class="table table-striped table-sm table-responsive-lg">
         <thead class="thead-dark">
@@ -44,5 +36,6 @@
         </tbody>
 
     </table>
+    <partial name="_bottomBar" model="@paginator"/>
 
 </div>

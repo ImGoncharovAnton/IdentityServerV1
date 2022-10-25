@@ -1,8 +1,8 @@
 ﻿using IdsTemp.Core.IRepositories;
 using IdsTemp.Models;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdsTemp.Core.Repositories;
@@ -19,22 +19,26 @@ public class RoleRepository: IRoleRepository
     }
 
 
-    public async Task<ICollection<RoleModel>> GetRolesAsync(string filter = null)
+    public async Task<PaginatedList<RoleModel>> GetRolesAsync(string searchText="", int pageIndex = 1, int pageSize = 5)
     {
         var query = _roleManager.Roles.AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(filter))
+        if (!string.IsNullOrWhiteSpace(searchText))
         {
-            query = query.Where(x => x.Name.Contains(filter));
+            query = query.Where(x => x.Name.Contains(searchText));
         }
 
-        var result = query.Select(x => new RoleModel
+        var roleModels = query.Select(x => new RoleModel
         {
             Id = x.Id,
             Name = x.Name
         });
+
+        var roles = await roleModels.ToListAsync();
         
-        return await result.AsNoTracking().ToListAsync();
+        var resRoles = new PaginatedList<RoleModel>(roles, pageIndex, pageSize);
+        
+        return resRoles;
     }
 
     public async Task<RoleModel> GetRoleAsync(string id)

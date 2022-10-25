@@ -1,6 +1,7 @@
 ﻿using IdentityModel;
 using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,15 +19,22 @@ public class ClientsController : Controller
     }
 
     // GET
-    public async Task<IActionResult> Index(string filter)
+    public async Task<IActionResult> Index(string searchText = "", int pg = 1, int pageSize = 5)
     {
-        var clients = await _clientRepository.GetAllAsync(filter);
-        var ClientsVm = new ClientViewModel
+        ViewBag.SearchText = searchText;
+        
+        var clients = await _clientRepository.GetAllAsync(searchText, pg, pageSize);
+        
+        var paginator = new PaginatorModel(clients.TotalRecords, pg, pageSize);
+        paginator.SearchText = searchText;
+        ViewBag.Paginator = paginator;
+        
+        var clientsVm = new ClientViewModel
         {
             Clients = clients
         };
 
-        return View(ClientsVm);
+        return View(clientsVm);
     }
 
     //EDIT

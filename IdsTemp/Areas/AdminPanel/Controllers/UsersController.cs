@@ -1,5 +1,6 @@
 ﻿using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -24,10 +25,25 @@ public class UsersController : Controller
         _logger = logger;
     }
 
-    public async Task<IActionResult> Index(string filter)
+    public async Task<IActionResult> Index(string sortExpression="", string searchText = "", int pg = 1, int pageSize = 5)
     {
-        var users = await _userRepository.GetAllUserAsync(filter);
+        var sortModel = new SortModel();
+        sortModel.AddColumn("username");
+        sortModel.AddColumn("email");
+        sortModel.AddColumn("role");
+        sortModel.ApplySort(sortExpression);
+        ViewData["sortModel"] = sortModel;
+        
+        ViewBag.SearchText = searchText;
+        
+        var users = await _userRepository.GetAllUserAsync(sortModel.SortedProperty, sortModel.SortedOrder, searchText, pg, pageSize);
 
+        var paginator = new PaginatorModel(users.TotalRecords, pg, pageSize);
+        paginator.SearchText = searchText;
+        paginator.SortExpression = sortExpression;
+        ViewBag.Paginator = paginator;
+        
+        
         var usersVm = new UsersViewModel
         {
             Users = users
@@ -151,5 +167,59 @@ public class UsersController : Controller
     {
         await _userRepository.DeleteUser(id);
         return RedirectToAction(nameof(Index));
+    }
+    
+    private SortModel ApplySort(string sortExpression)
+    {
+        ViewData["SortParamUsername"] = "username";
+        ViewData["SortParamEmail"] = "email";
+        ViewData["SortParamRole"] = "role";
+        ViewData["SortIconUsername"] = "";
+        ViewData["SortIconEmail"] = "";
+        ViewData["SortIconRole"] = "";
+
+        var sortModel = new SortModel();
+
+        switch (sortExpression.ToLower())
+        {
+            case "username_desc":
+                sortModel.SortedOrder = SortOrder.Descending;
+                sortModel.SortedProperty = "username";
+                ViewData["SortIconUsername"] = "bi bi-arrow-up";
+                ViewData["SortParamUsername"] = "username";
+                break;
+            case "email":
+                sortModel.SortedOrder = SortOrder.Ascending;
+                sortModel.SortedProperty = "email";
+                ViewData["SortIconEmail"] = "bi bi-arrow-down";
+                ViewData["SortParamEmail"] = "email_desc";
+                break;
+            case "email_desc":
+                sortModel.SortedOrder = SortOrder.Descending;
+                sortModel.SortedProperty = "email";
+                ViewData["SortIconEmail"] = "bi bi-arrow-up";
+                ViewData["SortParamEmail"] = "email";
+                break;
+            case "role":
+                sortModel.SortedOrder = SortOrder.Ascending;
+                sortModel.SortedProperty = "role";
+                ViewData["SortIconRole"] = "bi bi-arrow-down";
+                ViewData["SortParamRole"] = "role_desc";
+                break;
+            case "role_desc":
+                sortModel.SortedOrder = SortOrder.Descending;
+                sortModel.SortedProperty = "role";
+                ViewData["SortIconRole"] = "bi bi-arrow-up";
+                ViewData["SortParamRole"] = "role";
+                break;
+            default:
+                sortModel.SortedOrder = SortOrder.Ascending;
+                sortModel.SortedProperty = "username";
+                ViewData["SortIconUsername"] = "bi bi-arrow-down";
+                ViewData["SortParamUsername"] = "username_desc";
+                break;
+        }
+
+        return sortModel;
     }
 }

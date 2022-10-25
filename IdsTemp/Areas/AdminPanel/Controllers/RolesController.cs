@@ -1,5 +1,6 @@
 ﻿using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,9 +18,16 @@ public class RolesController : Controller
     }
 
 
-    public async Task<IActionResult> Index(string filter)
+    public async Task<IActionResult> Index(string searchText = "", int pg = 1, int pageSize = 5)
     {
-        var roles = await _roleRepository.GetRolesAsync(filter);
+        ViewBag.SearchText = searchText;
+        
+        var roles = await _roleRepository.GetRolesAsync(searchText, pg, pageSize);
+        
+        var paginator = new PaginatorModel(roles.TotalRecords, pg, pageSize);
+        paginator.SearchText = searchText;
+        ViewBag.Paginator = paginator;
+        
         var rolesVm = new RolesViewModel
         {
             Roles = roles

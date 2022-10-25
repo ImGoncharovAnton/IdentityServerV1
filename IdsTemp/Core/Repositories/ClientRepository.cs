@@ -4,6 +4,7 @@ using Duende.IdentityServer.EntityFramework.Mappers;
 using Duende.IdentityServer.Models;
 using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdsTemp.Core.Repositories;
@@ -17,7 +18,7 @@ public class ClientRepository : IClientRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<ClientSummaryModel>> GetAllAsync(string filter = null)
+    public async Task<PaginatedList<ClientSummaryModel>> GetAllAsync(string searchText="", int pageIndex = 1, int pageSize = 5)
     {
         var grants = new[] { GrantType.AuthorizationCode, GrantType.ClientCredentials };
 
@@ -26,12 +27,12 @@ public class ClientRepository : IClientRepository
             .Where(x => x.AllowedGrantTypes.Count == 1 &&
                         x.AllowedGrantTypes.Any(grant => grants.Contains(grant.GrantType)));
 
-        if (!string.IsNullOrWhiteSpace(filter))
+        if (!string.IsNullOrWhiteSpace(searchText))
         {
-            query = query.Where(x => x.ClientId.Contains(filter) || x.ClientName.Contains(filter));
+            query = query.Where(x => x.ClientId.Contains(searchText) || x.ClientName.Contains(searchText));
         }
 
-        var result = query.Select(x => new ClientSummaryModel
+        var clientsModel = query.Select(x => new ClientSummaryModel
         {
             ClientId = x.ClientId,
             Name = x.ClientName,
@@ -39,8 +40,12 @@ public class ClientRepository : IClientRepository
                 ? Flow.ClientCredentials
                 : Flow.CodeFlowWithPkce
         });
+        
+        var clients = await clientsModel.ToListAsync();
 
-        return await result.ToArrayAsync();
+        var resRoles = new PaginatedList<ClientSummaryModel>(clients, pageIndex, pageSize);
+        
+        return resRoles;
     }
 
     public async Task<ClientModel> GetByIdAsync(string id)

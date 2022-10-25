@@ -3,6 +3,7 @@ using Duende.IdentityServer.EntityFramework.Entities;
 using Duende.IdentityServer.EntityFramework.Mappers;
 using IdsTemp.Core.IRepositories;
 using IdsTemp.Models.AdminPanel;
+using IdsTemp.Models.Common;
 using Microsoft.EntityFrameworkCore;
 using ApiScope = Duende.IdentityServer.Models.ApiScope;
 
@@ -18,23 +19,27 @@ public class ApiScopeRepository : IApiScopeRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<ApiScopeSummaryModel>> GetAllAsync(string filter = null)
+    public async Task<PaginatedList<ApiScopeSummaryModel>> GetAllAsync(string searchText="", int pageIndex = 1, int pageSize = 5)
     {
         var query = _context.ApiScopes
             .Include(x => x.UserClaims).AsQueryable();
         
-        if (!String.IsNullOrWhiteSpace(filter))
+        if (!String.IsNullOrWhiteSpace(searchText))
         {
-            query = query.Where(x => x.Name.Contains(filter) || x.DisplayName.Contains(filter));
+            query = query.Where(x => x.Name.Contains(searchText) || x.DisplayName.Contains(searchText));
         }
         
-        var result = query.Select(x => new ApiScopeSummaryModel
+        var apiScopeModels = query.Select(x => new ApiScopeSummaryModel
         {
             Name = x.Name,
             DisplayName = x.DisplayName
         });
         
-        return await result.ToListAsync();
+        var apiScopes = await apiScopeModels.ToListAsync();
+        
+        var resRoles = new PaginatedList<ApiScopeSummaryModel>(apiScopes, pageIndex, pageSize);
+        
+        return resRoles;
     }
     
     public async Task<ApiScopeModel> GetByIdAsync(string id)
