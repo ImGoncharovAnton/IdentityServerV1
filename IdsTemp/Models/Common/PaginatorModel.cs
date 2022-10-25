@@ -29,7 +29,7 @@ public class PaginatorModel
         TotalPages = totalPages;
 
         var startPage = currentPage;
-        var endPage = currentPage + 2;
+        var endPage = currentPage + 4;
 
         if (startPage <= 0)
         {
