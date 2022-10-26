@@ -8,32 +8,41 @@
 }
 
 <div class="nav-page">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-
-        <a href="~/" class="navbar-brand pl-3">IdentityServer</a>
-
-        <ul class="navbar-nav mr-auto">
-
-            @if (!string.IsNullOrWhiteSpace(name))
-            {
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-                        @name <b class="caret"></b>
-                    </a>
-
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" asp-area="" asp-action="Logout" asp-controller="Account">Logout</a>
-                        <a class="dropdown-item" asp-area="" asp-action="Index" asp-controller="Diagnostics">Diagnostics</a>
-                    </div>
-                </li>
-            }
-            @if (User.IsInRole("ISAdministrator"))
-            {
-                <li class="nav-item">
-                    <a class="nav-link" asp-area="AdminPanel" asp-controller="Home" asp-action="Index">Admin Panel</a>
-                </li>
-            }
-        </ul>
-
-    </nav>
+     <div class="auth-container">
+            <nav class="auth-navbar">
+                <div class="auth-nav-container">
+                    <a href="~/" class="auth-brand">IdentityServer</a>
+    
+                    <ul class="auth-navbar-list">
+    
+                        @if (!string.IsNullOrWhiteSpace(name))
+                        {
+                            <li class="auth-nav-item dropdown">
+                                <a href="#" class="auth-nav-link dropdown-toggle" data-toggle="dropdown">
+                                    @name <b class="caret"></b>
+                                </a>
+    
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-area="" asp-action="Logout" asp-controller="Account">Logout</a>
+                                    <a class="dropdown-item" asp-area="" asp-action="Index" asp-controller="Diagnostics">Diagnostics</a>
+                                </div>
+                            </li>
+                        }
+                        @if (User.IsInRole("ISAdministrator"))
+                        {
+                            <li class="auth-nav-item">
+                                <a class="auth-nav-link" asp-area="AdminPanel" asp-controller="Home" asp-action="Index">Admin Panel</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+    
+                @if (User.IsInRole("ISAdministrator"))
+                {
+                    <li class="auth-nav-item flex-cc">
+                        <a class="auth-nav-link flex-cc" asp-area="AdminPanel" asp-controller="Settings" asp-action="Index"><i class="bi bi-gear"></i>Settings</a>
+                    </li>
+                }
+            </nav>
+        </div>
 </div>

@@ -4,7 +4,7 @@
     var version = typeof(Duende.IdentityServer.Hosting.IdentityServerMiddleware).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+').First();
 }
 
-<div class="welcome-page">
+<div class="welcome-page flex-cc">
     <h1>
         <img src="~/duende-logo.svg" class="logo">
         Welcome to Duende IdentityServer
@@ -25,11 +25,5 @@
         </li>
         
          <li><a asp-area="AdminPanel" asp-controller="Home" asp-action="Index">Admin Panel</a></li>
-        
-        <li>
-            Here are links to the
-            <a href="https://github.com/duendesoftware/IdentityServer">source code repository</a>,
-            and <a href="https://github.com/duendesoftware/samples">ready to use samples</a>.
-        </li>
     </ul>
 </div>

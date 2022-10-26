@@ -10,18 +10,18 @@
     <form method="post" asp-action="New">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
-            <label asp-for="Name" class="control-label"></label>
-            <input asp-for="Name" minlength="4" maxlength="40" class="common-input"/>
+            <label asp-for="Name" class="common-label"></label>
+            <input asp-for="Name" placeholder="Please, enter API scope name" minlength="4" maxlength="40" class="common-input"/>
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="DisplayName" class="control-label"></label>
-            <input class="common-input" minlength="4" maxlength="40" asp-for="DisplayName"/>
+            <label asp-for="DisplayName" class="common-label"></label>
+            <input class="common-input" placeholder="Please, enter API scope display name" minlength="4" maxlength="40" asp-for="DisplayName"/>
             <span asp-validation-for="DisplayName" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="UserClaims" class="control-label">User Claims (space delimited)</label>
-            <input class="common-input" minlength="4" maxlength="40" asp-for="UserClaims"/>
+            <label asp-for="UserClaims" class="common-label">User Claims (space delimited)</label>
+            <input class="common-input" placeholder="Please, enter list user claims (space delimited), if you want" minlength="4" maxlength="40" asp-for="UserClaims"/>
             <span asp-validation-for="UserClaims" class="text-danger"></span>
         </div>
         <div class="block-buttons flex-gap-1">

@@ -13,36 +13,53 @@
 
     <link rel="icon" type="image/x-icon" href="~/favicon.ico"/>
     <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico"/>
-
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     @{
         var context = _httpContextAccessor.HttpContext?.Request;
         var theme = context?.Cookies["currentTheme"]?.ToString();
 
-        if (theme.IsNullOrEmpty() || theme == "default")
+        if (theme.IsNullOrEmpty() || theme == "light-green")
         {
-            <link rel="stylesheet" href="~/css/themes/site.css" asp-append-version="true"/>
+            <link rel="stylesheet" href="~/css/themes/light-green.css" asp-append-version="true"/>
         }
         else
         {
             switch (theme)
             {
-                case "green":
-                    <link rel="stylesheet" href="~/css/themes/green.css"/>
+                case "dark-green":
+                    <link rel="stylesheet" href="~/css/themes/dark-green.css"/>
                     break;
-                case "red":
-                    <link rel="stylesheet" href="~/css/themes/red.css"/>
+                case "dark-blue":
+                    <link rel="stylesheet" href="~/css/themes/dark-blue.css"/>
                     break;
-                case "blue":
-                    <link rel="stylesheet" href="~/css/themes/blue.css"/>
+                case "light-blue":
+                    <link rel="stylesheet" href="~/css/themes/light-blue.css"/>
+                    break;
+                case "light-red":
+                    <link rel="stylesheet" href="~/css/themes/light-red.css"/>
+                    break;
+                case "dark-red":
+                    <link rel="stylesheet" href="~/css/themes/dark-red.css"/>
+                    break;
+                case "light-yellow":
+                    <link rel="stylesheet" href="~/css/themes/light-yellow.css"/>
+                    break;
+                case "dark-yellow":
+                    <link rel="stylesheet" href="~/css/themes/dark-yellow.css"/>
+                    break;
+                case "light-purple":
+                    <link rel="stylesheet" href="~/css/themes/light-purple.css"/>
+                    break;
+                case "dark-purple":
+                    <link rel="stylesheet" href="~/css/themes/dark-purple.css"/>
+                    break;
+                case "light-gray":
+                    <link rel="stylesheet" href="~/css/themes/light-gray.css"/>
                     break;
             }
         }
-
     }
-    
-    @* <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/> *@
-    
+
     @* <link rel="stylesheet" href="~/IdsTemp.styles.css" asp-append-version="true"/> *@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"/>
 

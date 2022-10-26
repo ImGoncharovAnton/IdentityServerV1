@@ -1,3 +1,6 @@
+@using Duende.IdentityServer.Extensions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IHttpContextAccessor _httpContextAccessor
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +14,52 @@
     <link rel="icon" type="image/x-icon" href="~/favicon.ico"/>
     <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico"/>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/themes/site.css"/>
+   @{
+           var context = _httpContextAccessor.HttpContext?.Request;
+           var theme = context?.Cookies["currentTheme"]?.ToString();
+   
+           if (theme.IsNullOrEmpty() || theme == "light-green")
+           {
+               <link rel="stylesheet" href="~/css/themes/light-green.css" asp-append-version="true"/>
+           }
+           else
+           {
+               switch (theme)
+               {
+                   case "dark-green":
+                       <link rel="stylesheet" href="~/css/themes/dark-green.css"/>
+                       break;
+                   case "dark-blue":
+                       <link rel="stylesheet" href="~/css/themes/dark-blue.css"/>
+                       break;
+                   case "light-blue":
+                       <link rel="stylesheet" href="~/css/themes/light-blue.css"/>
+                       break;
+                   case "light-red":
+                       <link rel="stylesheet" href="~/css/themes/light-red.css"/>
+                       break;
+                   case "dark-red":
+                       <link rel="stylesheet" href="~/css/themes/dark-red.css"/>
+                       break;
+                   case "light-yellow":
+                       <link rel="stylesheet" href="~/css/themes/light-yellow.css"/>
+                       break;
+                   case "dark-yellow":
+                       <link rel="stylesheet" href="~/css/themes/dark-yellow.css"/>
+                       break;
+                   case "light-purple":
+                       <link rel="stylesheet" href="~/css/themes/light-purple.css"/>
+                       break;
+                   case "dark-purple":
+                       <link rel="stylesheet" href="~/css/themes/dark-purple.css"/>
+                       break;
+                   case "light-gray":
+                       <link rel="stylesheet" href="~/css/themes/light-gray.css"/>
+                       break;
+               }
+           }
+   
+       }
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,800" rel="stylesheet"/>
     <style>
         input:last-child::placeholder {
@@ -26,14 +74,14 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"/>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
+    @*<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>*@
 
 </head>
 <body>
 <partial name="_Nav"/>
 
-<div class="container body-container">
+<div class="auth-container">
     @RenderBody()
 </div>
 
@@ -43,4 +91,3 @@
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-.

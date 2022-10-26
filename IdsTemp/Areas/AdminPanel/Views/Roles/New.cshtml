@@ -11,8 +11,8 @@
     <form method="post" asp-action="New">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
-            <label asp-for="Name" class="control-label"></label>
-            <input asp-for="Name" class="common-input" minlength="2" maxlength="40"/>
+            <label asp-for="Name" class="common-label"></label>
+            <input asp-for="Name" placeholder="Please, enter role name" class="common-input" minlength="2" maxlength="40"/>
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <div class="block-buttons flex-gap-1">

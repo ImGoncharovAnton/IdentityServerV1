@@ -57,10 +57,17 @@ public class SettingsController : Controller
     {
         var themesList = new List<ThemeDetails>
         {
-            new ThemeDetails { Id = "default", Value = "Default" },
-            new ThemeDetails { Id = "green", Value = "Green" },
-            new ThemeDetails { Id = "red", Value = "Red" },
-            new ThemeDetails { Id = "blue", Value = "Blue" }
+            new ThemeDetails { Id = "light-green", Value = "Light Green" },
+            new ThemeDetails { Id = "dark-green", Value = "Dark Green" },
+            new ThemeDetails { Id = "light-blue", Value = "Light Blue" },
+            new ThemeDetails { Id = "dark-blue", Value = "Dark Blue" },
+            new ThemeDetails { Id = "light-red", Value = "Light Red" },
+            new ThemeDetails { Id = "dark-red", Value = "Dark Red" },
+            new ThemeDetails { Id = "light-yellow", Value = "Light Yellow" },
+            new ThemeDetails { Id = "dark-yellow", Value = "Dark Yellow" },
+            new ThemeDetails { Id = "light-purple", Value = "Light Purple" },
+            new ThemeDetails { Id = "dark-purple", Value = "Dark Purple" },
+            new ThemeDetails { Id = "light-gray", Value = "Light Gray" },
         };
 
         var selectListItem = themesList.Select(x => new SelectListItem

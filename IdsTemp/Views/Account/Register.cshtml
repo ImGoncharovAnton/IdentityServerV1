@@ -11,7 +11,7 @@
             @*<input type="hidden" asp-for="ReturnUrl"/>*@
             <div class="auth-input-block">
                 <input class="input-validation-error common-input auth-input"
-                       placeholder="username"
+                       placeholder="Please, enter username"
                        asp-for="Username"
                        autofocus
                        minlength="4"
@@ -20,20 +20,20 @@
             </div>
             <div class="auth-input-block">
                 <input class="input-validation-error common-input auth-input"
-                       placeholder="email"
+                       placeholder="Please, enter email"
                        asp-for="Email"
                        autofocus>
                 <span asp-validation-for="Email" class="auth-input-asp-validation"></span>
             </div>
             <div class="auth-input-block">
                 <input class="common-input auth-input"
-                       placeholder="first name"
+                       placeholder="Please, enter first name"
                        asp-for="FirstName"
                        autofocus>
             </div>
             <div class="auth-input-block">
                 <input class="common-input auth-input"
-                       placeholder="lastname"
+                       placeholder="Please, enter last name"
                        asp-for="LastName"
                        autofocus>
             </div>
@@ -41,7 +41,7 @@
                 <input type="password"
                        id="password"
                        class="input-validation-error common-input auth-input"
-                       placeholder="Password"
+                       placeholder="Please, enter password"
                        asp-for="Password"
                        autocomplete="off"
                        minlength="6" maxlength="40">
@@ -52,7 +52,7 @@
             </div>
             <button name="button" value="Register"
                     type="submit" id="submit"
-                    class="auth-button">
+                    class="auth-button flex-cc">
                 SIGN UP
             </button>
         </form>

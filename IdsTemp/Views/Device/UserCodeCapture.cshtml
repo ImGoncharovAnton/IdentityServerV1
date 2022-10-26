@@ -6,18 +6,15 @@
         <p>Please enter the code displayed on your device.</p>
     </div>
 
-    <partial name="_ValidationSummary" />
-
-    <div class="row">
-        <div class="col-sm-6">
-            <form asp-action="UserCodeCapture">
-                <div class="form-group">
-                    <label for="userCode">User Code:</label>
-                    <input class="form-control" for="userCode" name="userCode" autofocus />
-                </div>
-
-                <button class="btn btn-primary" name="button">Submit</button>
-            </form>
+    <partial name="_ValidationSummary"/>
+    
+    <form asp-action="UserCodeCapture">
+        <div class="form-group">
+            <label for="userCode">User Code:</label>
+            <input class="form-control" for="userCode" name="userCode" autofocus/>
         </div>
-    </div>
+
+        <button class="btn btn-primary" name="button">Submit</button>
+    </form>
+
 </div>
