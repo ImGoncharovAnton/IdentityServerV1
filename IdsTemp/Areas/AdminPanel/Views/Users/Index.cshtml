@@ -15,51 +15,53 @@
     <h2 class="common-heading"></h2>
 
     <partial name="_topBar" model="@paginator"/>
+    <div class="auth-new-button-container">
+        <a asp-action="New" class="flex-cc common-button auth-new-button">New</a>
+    </div>
 
-    <table class="table table-striped table-sm table-responsive-lg">
-        <thead class="thead-dark">
-        <tr class="users-tr-head">
-            <th>ID</th>
-            <th>
-                <i class="@sortModel.GetColumn("username").SortIcon" arial-hidden="true"></i>
-                <a asp-action="Index" asp-route-sortExpression="@sortModel.GetColumn("username").SortExpression">UserName</a>
-            </th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>
-                <i class="@sortModel.GetColumn("email").SortIcon" arial-hidden="true"></i>
-                <a asp-action="Index" asp-route-sortExpression="@sortModel.GetColumn("email").SortExpression">Email</a>
-            </th>
-            <th>Phone</th>
-            <th>
-                <i class="@sortModel.GetColumn("role").SortIcon" arial-hidden="true"></i>
-                <a asp-action="Index" asp-route-sortExpression="@sortModel.GetColumn("role").SortExpression">Role</a>
-            </th>
-            <th></th>
-
-        </tr>
-        </thead>
-
-        <tbody>
-        @foreach (var user in Model.Users)
-        {
+    <div class="auth-table-container">
+        <table class="auth-table">
+            <thead class="auth-table__thead">
             <tr>
-                <td class="id-td-column">@user.Id</td>
-                <td>@user.UserName</td>
-                <td>@user.FirstName</td>
-                <td>@user.LastName</td>
-                <td>@user.Email</td>
-                <td>@user.Phone</td>
-                <td>@user.Role</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-info mr-1">Edit</a>|
-                    <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger">Delete</a>
-                </td>
-            </tr>
-        }
-        </tbody>
+                <th>ID</th>
+                <th>
+                    <a class="auth-sort-column" asp-action="Index" asp-route-sortExpression="@sortModel.GetColumn("username").SortExpression"><i class="@sortModel.GetColumn("username").SortIcon" arial-hidden="true"></i>UserName</a>
+                </th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>
+                    <a class="auth-sort-column" asp-action="Index" asp-route-sortExpression="@sortModel.GetColumn("email").SortExpression"><i class="@sortModel.GetColumn("email").SortIcon" arial-hidden="true"></i>Email</a>
+                </th>
+                <th>Phone</th>
+                <th>
+                    <a class="auth-sort-column" asp-action="Index" asp-route-sortExpression="@sortModel.GetColumn("role").SortExpression"><i class="@sortModel.GetColumn("role").SortIcon" arial-hidden="true"></i>Role</a>
+                </th>
+                <th></th>
 
-    </table>
-    
+            </tr>
+            </thead>
+
+            <tbody class="auth-table__tbody">
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td style="white-space: nowrap;max-width: 200px;overflow: hidden;text-overflow: ellipsis;">@user.Id</td>
+                    <td>@user.UserName</td>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>@user.Email</td>
+                    <td>@user.Phone</td>
+                    <td>@user.Role</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-info mr-1">Edit</a>|
+                        <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+
+        </table>
+    </div>
+
     <partial name="_bottomBar" model="@paginator"/>
 </div>

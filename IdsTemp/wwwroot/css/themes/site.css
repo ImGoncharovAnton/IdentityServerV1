@@ -421,6 +421,16 @@
     padding: 1rem;
     margin: 0 auto;
 }
+
+.auth-new-button-container {
+    max-width: 220px;
+    margin-bottom: 1rem;
+}
+
+.auth-new-button {
+   padding: 0.7rem;
+}
+
 /*Table*/
 
 .auth-table-container {

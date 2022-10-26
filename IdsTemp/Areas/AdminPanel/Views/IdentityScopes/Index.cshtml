@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Identities";
-    
+
     var paginator = ViewBag.Paginator;
 }
 
@@ -10,32 +10,37 @@
     <h2 class="common-heading">Identity Scopes</h2>
 
     <partial name="_topBar" model="@paginator"/>
-    
-    <table class="table table-striped table-sm table-responsive-lg">
-        <thead class="thead-dark">
-        <tr class="users-tr-head">
-            <th>Name</th>
-            <th>Display Name</th>
-            <th></th>
-        </tr>
-        </thead>
+    <div class="auth-new-button-container">
+        <a asp-action="New" class="flex-cc common-button auth-new-button">New</a>
+    </div>
 
-        <tbody>
-        @foreach (var scope in Model.Scopes)
-        {
+    <div class="auth-table-container">
+        <table class="auth-table">
+            <thead class="auth-table__thead">
             <tr>
-                <td>@scope.Name</td>
-                <td>@scope.DisplayName</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@scope.Name" class="btn btn-info mr-1">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@scope.Name" class="btn btn-danger">Delete</a>
-                </td>
+                <th>Name</th>
+                <th>Display Name</th>
+                <th></th>
             </tr>
-        }
-        </tbody>
+            </thead>
 
-    </table>
-    
+            <tbody class="auth-table__tbody">
+            @foreach (var scope in Model.Scopes)
+            {
+                <tr>
+                    <td>@scope.Name</td>
+                    <td>@scope.DisplayName</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@scope.Name" class="btn btn-info mr-1">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@scope.Name" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+
+        </table>
+    </div>
+
     <partial name="_bottomBar" model="@paginator"/>
-    
+
 </div>
