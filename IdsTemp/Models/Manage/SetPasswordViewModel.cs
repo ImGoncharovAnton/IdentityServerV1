@@ -2,20 +2,15 @@
 
 namespace IdsTemp.Models.Manage;
 
-public class ChangePasswordViewModel
+public class SetPasswordViewModel
 {
     [Required]
     [DataType(DataType.Password)]
-    public string OldPassword { get; set; }
-    
-    [Required]
-    [DataType(DataType.Password)]
     public string NewPassword { get; set; }
-    
-    [Required]
+
     [DataType(DataType.Password)]
-    [Compare("NewPassword", ErrorMessage = "Passwords is not equaled")]
+    [Compare("NewPassword")]
     public string ConfirmPassword { get; set; }
-    
+
     public string StatusMessage { get; set; }
 }

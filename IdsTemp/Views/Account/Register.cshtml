@@ -4,7 +4,7 @@
 
     <div class="auth-main-block">
         <div class="heading-block">
-             <h2 class="auth-heading">New account</h2>
+            <h2 class="auth-heading">New account</h2>
         </div>
         <form asp-route="Register" class="auth-inputs-block">
             @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
@@ -15,27 +15,16 @@
                        asp-for="Username"
                        autofocus
                        minlength="4"
-                       maxlength="50">
+                       maxlength="50"
+                       autocomplete="off">
                 <span asp-validation-for="Username" class="auth-input-asp-validation"></span>
             </div>
             <div class="auth-input-block">
                 <input class="input-validation-error common-input auth-input"
                        placeholder="Please, enter email"
                        asp-for="Email"
-                       autofocus>
+                       autocomplete="off">
                 <span asp-validation-for="Email" class="auth-input-asp-validation"></span>
-            </div>
-            <div class="auth-input-block">
-                <input class="common-input auth-input"
-                       placeholder="Please, enter first name"
-                       asp-for="FirstName"
-                       autofocus>
-            </div>
-            <div class="auth-input-block">
-                <input class="common-input auth-input"
-                       placeholder="Please, enter last name"
-                       asp-for="LastName"
-                       autofocus>
             </div>
             <div class="auth-input-block">
                 <input type="password"
@@ -43,6 +32,19 @@
                        class="input-validation-error common-input auth-input"
                        placeholder="Please, enter password"
                        asp-for="Password"
+                       autocomplete="off"
+                       minlength="6" maxlength="40">
+                <i class="bi bi-eye-slash auth-toggle-password"
+                   id="togglePassword">
+                </i>
+                <span asp-validation-for="Password" class="auth-input-asp-validation"></span>
+            </div>
+            <div class="auth-input-block">
+                <input type="password"
+                       id="password"
+                       class="input-validation-error common-input auth-input"
+                       placeholder="Please, repeat password"
+                       asp-for="ConfirmPassword"
                        autocomplete="off"
                        minlength="6" maxlength="40">
                 <i class="bi bi-eye-slash auth-toggle-password"

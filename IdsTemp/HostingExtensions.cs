@@ -4,8 +4,10 @@ using IdsTemp.Core.Repositories;
 using IdsTemp.Data;
 using IdsTemp.Extensions;
 using IdsTemp.Models;
+using IdsTemp.Options;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using Serilog;
@@ -49,7 +51,7 @@ internal static class HostingExtensions
         {
             dbContextOptionsBuilder.UseNpgsql(connStr, NpgsqlOptionsAction);
         });
-        
+
         builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(opt =>
             {
                 opt.Password.RequireDigit = true;
@@ -102,7 +104,18 @@ internal static class HostingExtensions
         builder.Services.AddTransient<IUserRepository, UserRepository>();
         builder.Services.AddTransient<ILogsRepository, LogsRepository>();
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        
+        builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
+        builder.Services.Configure<MailKitEmailSenderOptions>(options =>
+        {
+            options.Host_Address = "my-smtp-server";
+            options.Host_Port = 587;
+            options.Host_Username = "my-smtp-username";
+            options.Host_Password = "my-smtp-password";
+            options.Sender_EMail = "noreply@mydomain.com";
+            options.Sender_Name = "My Sender Name";
+        });
+
+        // for heroku cloud
         builder.Services.ConfigureNonBreakingSameSiteCookies();
         
         builder.Services.AddWebOptimizer(pipeline =>

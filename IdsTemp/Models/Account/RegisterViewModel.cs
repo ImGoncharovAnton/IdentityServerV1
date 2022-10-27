@@ -7,21 +7,25 @@ namespace IdsTemp.Models.Account
     public class RegisterViewModel
     {
         [Required]
-        [StringLength(150, ErrorMessage = "The first name field should have a maximum of 150 characters")]
+        [StringLength(40, ErrorMessage = "The first name field should have a maximum of 40 characters")]
         [Display(Name = "Username")]
         public string Username { get; set; }
 
         [Required]
-        [DataType(DataType.EmailAddress)]
+        [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+       
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
 
+        [DataType(DataType.Password)]
+        [Compare("Password")]
+        [Display(Name = "Confirm password")]
+        public string ConfirmPassword { get; set; }
+        
         public string ReturnUrl { get; set; }
 
         public bool AllowRememberLogin { get; set; } = true;

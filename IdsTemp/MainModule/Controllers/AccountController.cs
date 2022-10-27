@@ -1,16 +1,19 @@
 using System.Security.Claims;
+using System.Text;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
 using IdentityModel;
+using IdsTemp.Helpers;
 using IdsTemp.Models;
 using IdsTemp.Models.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace IdsTemp.MainModule.Controllers
 {
@@ -202,6 +205,7 @@ namespace IdsTemp.MainModule.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(string returnUrl)
         {
             // build a model so we know what to show on the reg page
@@ -270,9 +274,6 @@ namespace IdsTemp.MainModule.Controllers
                 {
                     UserName = model.Username,
                     Email = model.Email,
-                    EmailConfirmed = true,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName
                 };
 
                 var existEmail = await _userManager.FindByEmailAsync(model.Email);
@@ -291,6 +292,30 @@ namespace IdsTemp.MainModule.Controllers
 
 
                 var result = await _userManager.CreateAsync(user, model.Password);
+                
+                /*Email confirm*/
+                
+                // if (result.Succeeded)
+                // {
+                //     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                //     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                //     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
+                //
+                //     await _emailSender.SendEmailAsync(model.Email, _localizer["ConfirmEmailTitle"], _localizer["ConfirmEmailBody", HtmlEncoder.Default.Encode(callbackUrl)]);
+                //
+                //     if (_identityOptions.SignIn.RequireConfirmedAccount)
+                //     {
+                //         return View("RegisterConfirmation");
+                //     }
+                //     else
+                //     {
+                //         await _signInManager.SignInAsync(user, isPersistent: false);
+                //         return LocalRedirect(returnUrl);
+                //     }
+                // }
+                //
+                // AddErrors(result);
+                
                 if (result.Succeeded)
                 {
                     if (!_roleManager.RoleExistsAsync("User").GetAwaiter().GetResult())
@@ -357,6 +382,138 @@ namespace IdsTemp.MainModule.Controllers
             return View(model);
         }
         
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            if (userId == null || code == null)
+            {
+                return View("Error");
+            }
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return View("Error");
+            }
+
+            code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+        }
+
+        /*[HttpGet]
+        [AllowAnonymous]
+        public IActionResult ForgotPassword()
+        {
+            return View(new ForgotPasswordViewModel());
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                TUser user = null;
+                switch (model.Policy)
+                {
+                    case LoginResolutionPolicy.Email:
+                        try
+                        {
+                            user = await _userManager.FindByEmailAsync(model.Email);
+                        }
+                        catch (Exception ex)
+                        {
+                            // in case of multiple users with the same email this method would throw and reveal that the email is registered
+                            _logger.LogError("Error retrieving user by email ({0}) for forgot password functionality: {1}", model.Email, ex.Message);
+                            user = null;
+                        }
+                        break;
+                    case LoginResolutionPolicy.Username:
+                        try
+                        {
+                            user = await _userManager.FindByNameAsync(model.Username);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError("Error retrieving user by userName ({0}) for forgot password functionality: {1}", model.Username, ex.Message);
+                            user = null;
+                        }
+                        break;
+                }
+
+                if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    // Don't reveal that the user does not exist
+                    return View("ForgotPasswordConfirmation");
+                }
+
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
+
+                await _emailSender.SendEmailAsync(user.Email, _localizer["ResetPasswordTitle"], _localizer["ResetPasswordBody", HtmlEncoder.Default.Encode(callbackUrl)]);
+
+                return View("ForgotPasswordConfirmation");
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResetPassword(string code = null)
+        {
+            return code == null ? View("Error") : View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return RedirectToAction(nameof(ResetPasswordConfirmation), "Account");
+            }
+
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Code));
+            var result = await _userManager.ResetPasswordAsync(user, code, model.Password);
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction(nameof(ResetPasswordConfirmation), "Account");
+            }
+
+            AddErrors(result);
+
+            return View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResetPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }*/
+        
+        
+        
         /*[AcceptVerbs("Get", "Post")]
         public async Task<IActionResult> CheckEmail(string email)
         {
@@ -364,6 +521,14 @@ namespace IdsTemp.MainModule.Controllers
 
             return Json(existEmail == null);
         }*/
+        
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
 
         private async Task<RegisterViewModel> BuildRegisterViewModelAsync(string returnUrl)
         {
@@ -538,7 +703,7 @@ namespace IdsTemp.MainModule.Controllers
                 var idp = User.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
                 if (idp != null && idp != Duende.IdentityServer.IdentityServerConstants.LocalIdentityProvider)
                 {
-                    var providerSupportsSignout = await HttpContext.GetSchemeSupportsSignOutAsync(idp);
+                    var providerSupportsSignout = await Helpers.Extensions.GetSchemeSupportsSignOutAsync(HttpContext, idp);
                     if (providerSupportsSignout)
                     {
                         if (vm.LogoutId == null)

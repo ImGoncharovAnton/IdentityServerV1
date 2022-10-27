@@ -2,41 +2,34 @@ using Duende.IdentityServer.Models;
 using IdsTemp.Models.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace IdsTemp.Extensions;
-
-// Need add this methods after heroku stage
-
-public static class Extensions
+namespace IdsTemp.Helpers
 {
-    /// <summary>
-    /// Determines if the authentication scheme support signout.
-    /// </summary>
-    public static async Task<bool> GetSchemeSupportsSignOutAsync(this HttpContext context, string scheme)
+    public static class Extensions
     {
-        var provider = context.RequestServices.GetRequiredService<IAuthenticationHandlerProvider>();
-        var handler = await provider.GetHandlerAsync(context, scheme);
-        return (handler is IAuthenticationSignOutHandler);
-    }
-
-    /// <summary>
-    /// Checks if the redirect URI is for a native client.
-    /// </summary>
-    public static bool IsNativeClient(this AuthorizationRequest context)
-    {
-        return !context.RedirectUri.StartsWith("https", StringComparison.Ordinal)
+        /// <summary>
+        /// Checks if the redirect URI is for a native client.
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<bool> GetSchemeSupportsSignOutAsync(this HttpContext context, string scheme)
+        {
+            var provider = context.RequestServices.GetRequiredService<IAuthenticationHandlerProvider>();
+            var handler = await provider.GetHandlerAsync(context, scheme);
+            return (handler is IAuthenticationSignOutHandler);
+        }
+        
+        public static bool IsNativeClient(this AuthorizationRequest context)
+        {
+            return !context.RedirectUri.StartsWith("https", StringComparison.Ordinal)
                && !context.RedirectUri.StartsWith("http", StringComparison.Ordinal);
-    }
+        }
 
-    /// <summary>
-    /// Renders a loading page that is used to redirect back to the redirectUri.
-    /// </summary>
-    public static IActionResult LoadingPage(this Controller controller, string viewName, string redirectUri)
-    {
-        controller.HttpContext.Response.StatusCode = 200;
-        controller.HttpContext.Response.Headers["Location"] = "";
-
-        return controller.View(viewName, new RedirectViewModel { RedirectUri = redirectUri });
+        public static IActionResult LoadingPage(this Controller controller, string viewName, string redirectUri)
+        {
+            controller.HttpContext.Response.StatusCode = 200;
+            controller.HttpContext.Response.Headers["Location"] = "";
+            
+            return controller.View(viewName, new RedirectViewModel { RedirectUri = redirectUri });
+        }
     }
 }

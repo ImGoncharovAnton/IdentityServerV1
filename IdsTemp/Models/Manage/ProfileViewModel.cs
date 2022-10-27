@@ -4,12 +4,6 @@ namespace IdsTemp.Models.Manage;
 
 public class ProfileViewModel
 {
-    [Display(Name = "First name")]
-    public string FirstName { get; set; }
-    
-    [Display(Name = "Last name")]
-    public string LastName { get; set; }
-    
     [Display(Name = "User name")]
     public string UserName { get; set; }
     
@@ -28,11 +22,11 @@ public class ProfileViewModel
     public string Name { get; set; }
     
     [MaxLength(255)]
-    [Display(Name = "Website")]
+    [Display(Name = "Website Url")]
     public string Website { get; set; }
     
     [MaxLength(255)]
-    [Display(Name = "Profile")]
+    [Display(Name = "Profile Url")]
     public string Profile { get; set; }
     
     [MaxLength(255)]
