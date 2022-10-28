@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using System.Text.Encodings.Web;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Models;
@@ -12,6 +13,7 @@ using IdsTemp.Models.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 
@@ -28,6 +30,7 @@ namespace IdsTemp.MainModule.Controllers
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
+        private readonly IEmailSender _emailSender;
 
         public AccountController(
             IIdentityServerInteractionService interaction,
@@ -36,8 +39,8 @@ namespace IdsTemp.MainModule.Controllers
             IEventService events,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            RoleManager<ApplicationRole> roleInManager
-            )
+            RoleManager<ApplicationRole> roleInManager, 
+            IEmailSender emailSender)
         {
             // if the TestUserStore is not in DI, then we'll just use the global users collection
             // this is where you would plug in your own custom identity management library (e.g. ASP.NET Identity)
@@ -46,6 +49,7 @@ namespace IdsTemp.MainModule.Controllers
             _schemeProvider = schemeProvider;
             _events = events;
             _roleManager = roleInManager;
+            _emailSender = emailSender;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -108,7 +112,8 @@ namespace IdsTemp.MainModule.Controllers
             if (ModelState.IsValid)
             {
 
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: false);
+                /*ДОбавить страницу lockout  */
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(model.Username);
@@ -137,6 +142,10 @@ namespace IdsTemp.MainModule.Controllers
                
                 await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId:context?.Client.ClientId));
                 ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
+                // foreach (var error in result.Errors)
+                // {
+                //     ModelState.AddModelError(string.Empty, error.Description);
+                // }
             }
 
             // something went wrong, show form with error
@@ -208,7 +217,6 @@ namespace IdsTemp.MainModule.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register(string returnUrl)
         {
-            // build a model so we know what to show on the reg page
             var vm = await BuildRegisterViewModelAsync(returnUrl);
 
             return View(vm);
@@ -234,7 +242,7 @@ namespace IdsTemp.MainModule.Controllers
                     return Redirect("~/");
                 }
             }
-            
+            returnUrl ??= Url.Content("~/");
             ViewData["ReturnUrl"] = returnUrl;
 
             #region PasswordValidation
@@ -295,27 +303,6 @@ namespace IdsTemp.MainModule.Controllers
                 
                 /*Email confirm*/
                 
-                // if (result.Succeeded)
-                // {
-                //     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                //     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                //     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
-                //
-                //     await _emailSender.SendEmailAsync(model.Email, _localizer["ConfirmEmailTitle"], _localizer["ConfirmEmailBody", HtmlEncoder.Default.Encode(callbackUrl)]);
-                //
-                //     if (_identityOptions.SignIn.RequireConfirmedAccount)
-                //     {
-                //         return View("RegisterConfirmation");
-                //     }
-                //     else
-                //     {
-                //         await _signInManager.SignInAsync(user, isPersistent: false);
-                //         return LocalRedirect(returnUrl);
-                //     }
-                // }
-                //
-                // AddErrors(result);
-                
                 if (result.Succeeded)
                 {
                     if (!_roleManager.RoleExistsAsync("User").GetAwaiter().GetResult())
@@ -330,13 +317,39 @@ namespace IdsTemp.MainModule.Controllers
                     }
                     
                     await _userManager.AddToRoleAsync(user, "User");
+                    
+                    
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code, returnUrl = returnUrl }, HttpContext.Request.Scheme);
+                
+                    await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
+                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                
+                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    {
+                        return View("RegisterConfirmation");
+                    }
+                    else
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return RedirectToLocal(returnUrl);
+                    }
+                }
+                
+                AddErrors(result);
+
+                #region old temp custom register for identity
+
+                /*if (result.Succeeded)
+                {
 
                     /*await _userManager.AddClaimsAsync(user, new Claim[]{
                             new Claim(JwtClaimTypes.Name, model.Username),
                             new Claim(JwtClaimTypes.Email, model.Email),
                             new Claim(JwtClaimTypes.FamilyName, model.FirstName),
                             new Claim(JwtClaimTypes.GivenName, model.LastName),
-                            new Claim(JwtClaimTypes.Role,"User") });*/
+                            new Claim(JwtClaimTypes.Role,"User") });#1#
 
                     var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
                     var loginresult = await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, lockoutOnFailure: true);
@@ -374,7 +387,11 @@ namespace IdsTemp.MainModule.Controllers
                         }
                     }
 
-                }
+                }*/
+
+                #endregion
+                
+                
             }
 
             // If we got this far, something failed, redisplay form
@@ -384,7 +401,7 @@ namespace IdsTemp.MainModule.Controllers
         
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        public async Task<IActionResult> ConfirmEmail(string userId, string code, string returnUrl = null)
         {
             if (userId == null || code == null)
             {
@@ -397,8 +414,11 @@ namespace IdsTemp.MainModule.Controllers
             }
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-
+            
             var result = await _userManager.ConfirmEmailAsync(user, code);
+            
+            ViewData["returnUrl"] =  returnUrl;
+            
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
@@ -521,6 +541,10 @@ namespace IdsTemp.MainModule.Controllers
 
             return Json(existEmail == null);
         }*/
+       
+        /*****************************************/
+        /* helper APIs for the AccountController */
+        /*****************************************/
         
         private void AddErrors(IdentityResult result)
         {
@@ -529,8 +553,18 @@ namespace IdsTemp.MainModule.Controllers
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
+        
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
 
-        private async Task<RegisterViewModel> BuildRegisterViewModelAsync(string returnUrl)
+            return RedirectToAction(nameof(HomeController.Index), "Home");
+        }
+        
+         private async Task<RegisterViewModel> BuildRegisterViewModelAsync(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
             List<string> roles = new List<string>();
@@ -591,9 +625,7 @@ namespace IdsTemp.MainModule.Controllers
                 ExternalProviders = providers.ToArray()
             };
         }
-        /*****************************************/
-        /* helper APIs for the AccountController */
-        /*****************************************/
+        
         private async Task<LoginViewModel> BuildLoginViewModelAsync(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);

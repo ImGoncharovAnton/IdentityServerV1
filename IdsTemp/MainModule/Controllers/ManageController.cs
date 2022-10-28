@@ -20,6 +20,7 @@ public class ManageController : Controller
     // private readonly IEmailSender _emailSender;
     private readonly ILogger<ManageController> _logger;
     private readonly UrlEncoder _urlEncoder;
+    private readonly IEmailSender _emailSender;
 
     private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
@@ -28,13 +29,13 @@ public class ManageController : Controller
     public ManageController(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        // IEmailSender emailSender,
+        IEmailSender emailSender,
         ILogger<ManageController> logger,
         UrlEncoder urlEncoder)
     {
         _userManager = userManager;
         _signInManager = signInManager;
-        // _emailSender = emailSender;
+        _emailSender = emailSender;
         _logger = logger;
         _urlEncoder = urlEncoder;
     }
@@ -104,8 +105,8 @@ public class ManageController : Controller
         var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code },
             HttpContext.Request.Scheme);
 
-        /*await _emailSender.SendEmailAsync(model.Email, "Confirm email",
-            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");*/
+        await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
+            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
         StatusMessage = "Verification sent";
 

@@ -59,10 +59,24 @@ internal static class HostingExtensions
                 opt.Password.RequireNonAlphanumeric = true;
                 opt.Password.RequireUppercase = true;
                 opt.Password.RequiredLength = 6;
+                opt.SignIn.RequireConfirmedAccount = true;
+                opt.User.RequireUniqueEmail = true;
+                opt.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddTokenProvider<EmailConfirmationTokenProvider<ApplicationUser>>("emailconfirmation");
 
+        builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+        {
+            opt.TokenLifespan = TimeSpan.FromHours(2);
+        });
+        
+        builder.Services.Configure<EmailConfirmationTokenProviderOptions>(opt =>
+        {
+            opt.TokenLifespan = TimeSpan.FromDays(3);
+        });
+        
         builder.Services
             .AddIdentityServer(options =>
             {
@@ -107,12 +121,12 @@ internal static class HostingExtensions
         builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
         builder.Services.Configure<MailKitEmailSenderOptions>(options =>
         {
-            options.Host_Address = "my-smtp-server";
-            options.Host_Port = 587;
-            options.Host_Username = "my-smtp-username";
-            options.Host_Password = "my-smtp-password";
-            options.Sender_EMail = "noreply@mydomain.com";
-            options.Sender_Name = "My Sender Name";
+            options.Host_Address = builder.Configuration["ExternalProviders:MailKit:SMTP:Address"];
+            options.Host_Port = Convert.ToInt32(builder.Configuration["ExternalProviders:MailKit:SMTP:Port"]);
+            options.Host_Username = builder.Configuration["ExternalProviders:MailKit:SMTP:Account"];
+            options.Host_Password = builder.Configuration["ExternalProviders:MailKit:SMTP:Password"];
+            options.Sender_EMail = builder.Configuration["ExternalProviders:MailKit:SMTP:SenderEmail"];
+            options.Sender_Name = builder.Configuration["ExternalProviders:MailKit:SMTP:SenderName"];
         });
 
         // for heroku cloud
