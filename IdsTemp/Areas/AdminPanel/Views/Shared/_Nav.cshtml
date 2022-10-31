@@ -30,20 +30,14 @@
                             </div>
                         </li>
                     }
-                    @if (User.IsInRole("ISAdministrator"))
-                    {
-                        <li class="auth-nav-item">
-                            <a class="auth-nav-link" asp-area="AdminPanel" asp-controller="Home" asp-action="Index">Admin Panel</a>
-                        </li>
-                    }
+
                 </ul>
             </div>
-
-            @if (User.IsInRole("ISAdministrator"))
+            @if (User.IsAuthenticated())
             {
-                <li class="auth-nav-item flex-cc">
-                    <a class="auth-nav-link flex-cc" asp-area="AdminPanel" asp-controller="Settings" asp-action="Index"><i class="bi bi-gear"></i>Settings</a>
-                </li>
+                <div class="auth-nav-item">
+                    <a class="auth-nav-link" asp-area="" asp-action="Logout" asp-controller="Account">Logout</a>
+                </div>
             }
         </nav>
     </div>

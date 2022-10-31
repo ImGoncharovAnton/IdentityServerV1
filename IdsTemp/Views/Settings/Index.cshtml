@@ -1,4 +1,5 @@
-﻿@model SettingsViewModel
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IdsTemp.Models.AdminPanel.SettingsViewModel
 
 @{
     ViewData["Title"] = "Settings";
@@ -13,6 +14,6 @@
        </div>
    </form>
    
-   <a href="~/.well-known/openid-configuration">open-id server configuration</a> 
+   <a href="~/.well-known/openid-configuration">discovery server configuration</a> 
 </div>
 

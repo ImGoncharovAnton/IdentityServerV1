@@ -111,6 +111,7 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\LICENSE.md" />
       <_ContentIncludedByDefault Remove="Views\Admin\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\AdminPanel\Views\Settings\Index.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -121,6 +122,7 @@
       <AdditionalFiles Include="Areas\AdminPanel\Views\Shared\_ScopeListItem.cshtml" />
       <AdditionalFiles Include="Areas\AdminPanel\Views\Shared\_ValidationScriptsPartial.cshtml" />
       <AdditionalFiles Include="Areas\AdminPanel\Views\Shared\_ValidationSummary.cshtml" />
+      <AdditionalFiles Include="Views\Settings\Index.cshtml" />
     </ItemGroup>
 
     <ItemGroup>

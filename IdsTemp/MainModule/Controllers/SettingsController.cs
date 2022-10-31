@@ -1,15 +1,12 @@
-﻿using Duende.IdentityServer.Extensions;
-using IdsTemp.Models;
+﻿using IdsTemp.Models;
 using IdsTemp.Models.AdminPanel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace IdsTemp.Areas.AdminPanel.Controllers;
+namespace IdsTemp.MainModule.Controllers;
 
-[Authorize(Roles = "ISAdministrator")]
-[Area("AdminPanel")]
+[Authorize]
 public class SettingsController : Controller
 {
     /*private readonly IHttpContextAccessor _httpContextAccessor;*/

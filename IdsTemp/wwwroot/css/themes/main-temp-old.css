@@ -25,7 +25,7 @@ body a:hover {
 }
 
 .welcome-page .logo {
-    width: 64px;
+    width: 44px;
 }
 
 .icon-banner {
@@ -183,6 +183,7 @@ body a:hover {
     font-size: 24px;
     color: rgba(42, 45, 51, 0.8);
     text-align: center;
+    margin-bottom: 1rem;
 }
 
 .auth-description {
@@ -284,6 +285,7 @@ body a:hover {
     border: 1px solid var(--light-gray-color);
     border-radius: 5px;
     transition: box-shadow .3s ease 0s;
+    width: 100%;
 }
 
 .admin-card:hover {
@@ -292,7 +294,8 @@ body a:hover {
 
 .admin-card__header {
     background-color: var(--light-gray-color);
-    padding: 1.2rem;
+    padding: 0.5rem 1rem;
+    min-height: 6rem;
 }
 
 .admin-card__body {
@@ -304,6 +307,7 @@ body a:hover {
 .admin-card__title {
     color: var(--dark-gray-color);
     font-size: 1.5rem;
+    text-align: center;
 }
 
 .admin-card__icon {

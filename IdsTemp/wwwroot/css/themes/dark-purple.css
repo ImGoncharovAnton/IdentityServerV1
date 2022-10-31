@@ -29,7 +29,7 @@ body a:hover {
 }
 
 .welcome-page .logo {
-    width: 64px;
+    width: 44px;
 }
 
 .icon-banner {
@@ -191,6 +191,7 @@ body a:hover {
     font-size: 24px;
     color: var(--text-color);
     text-align: center;
+    margin-bottom: 1rem;
 }
 
 .auth-description {
@@ -299,8 +300,8 @@ body a:hover {
 
 .admin-card__header {
     background-color: var(--light-color);
-    padding: 1.2rem;
-
+    padding: 0.5rem 1rem;
+    min-height: 6rem;
 }
 
 .admin-card__body {
@@ -313,6 +314,7 @@ body a:hover {
     color: var(--text-color);
     /*opacity: 0.8;*/
     font-size: 1.5rem;
+    text-align: center;
 }
 
 .admin-card__icon {
@@ -715,6 +717,10 @@ body a:hover {
     text-decoration: none;
 }
 
+.not-auth-cards {
+    gap: 1.5rem;
+}
+
 @media screen and (max-width: 992px) {
     .admin-cards {
         grid-template-columns: repeat(2, 1fr);
@@ -745,6 +751,10 @@ body a:hover {
 }
 
 @media screen and (max-width: 576px) {
+    .not-auth-cards {
+        flex-direction: column;
+    }
+    
     .admin-cards {
         grid-template-columns: 1fr;
     }
