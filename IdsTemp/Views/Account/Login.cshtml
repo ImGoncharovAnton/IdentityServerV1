@@ -32,17 +32,15 @@
                     </i>
                     <span asp-validation-for="Password" class="auth-input-asp-validation"></span>
                 </div>
-                @*  @if (Model.AllowRememberLogin)
-                        {
-                            <div class="form-group">
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="RememberLogin">
-                                    <label class="form-check-label" asp-for="RememberLogin" style="font-weight: 400;font-size: 14px;color: #6C6F7B;">
-                                        Remember me
-                                    </label>
-                                </div>
-                            </div>
-                        }*@
+                @if (Model.AllowRememberLogin)
+                {
+                    <div class="flex-gap-1">
+                        <toggle-button>
+                            <input asp-for="RememberLogin" type="checkbox">
+                        </toggle-button>
+                        <div>Remember me</div>
+                    </div>
+                }
                 <button name="button" value="login"
                         type="submit" id="submit"
                         class="auth-button flex-cc">
@@ -51,7 +49,7 @@
             </form>
 
             <a asp-controller="Account" asp-action="ForgotPassword" value="forgot" class="auth-link">
-                Forgot password
+                Forgot password?
             </a>
             <a href="@Url.Action("Register", new { Model.ReturnUrl })" class="auth-link">
                 Create account
