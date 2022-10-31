@@ -31,6 +31,7 @@ namespace IdsTemp.MainModule.Controllers
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
         private readonly IEmailSender _emailSender;
+        private readonly ILogger<AccountController> _logger;
 
         public AccountController(
             IIdentityServerInteractionService interaction,
@@ -40,7 +41,8 @@ namespace IdsTemp.MainModule.Controllers
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleInManager, 
-            IEmailSender emailSender)
+            IEmailSender emailSender, 
+            ILogger<AccountController> logger)
         {
             // if the TestUserStore is not in DI, then we'll just use the global users collection
             // this is where you would plug in your own custom identity management library (e.g. ASP.NET Identity)
@@ -50,6 +52,7 @@ namespace IdsTemp.MainModule.Controllers
             _events = events;
             _roleManager = roleInManager;
             _emailSender = emailSender;
+            _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -111,8 +114,6 @@ namespace IdsTemp.MainModule.Controllers
 
             if (ModelState.IsValid)
             {
-
-                /*ДОбавить страницу lockout  */
                 var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
@@ -139,6 +140,11 @@ namespace IdsTemp.MainModule.Controllers
                         throw new Exception("invalid return url");
                     }
                 }
+                
+                if (result.IsLockedOut)
+                {
+                    return RedirectToAction("Lockout", new {model.ReturnUrl});
+                }
                
                 await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId:context?.Client.ClientId));
                 ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
@@ -153,7 +159,7 @@ namespace IdsTemp.MainModule.Controllers
             return View(vm);
         }
 
-        
+       
         /// <summary>
         /// Show logout page
         /// </summary>
@@ -305,6 +311,8 @@ namespace IdsTemp.MainModule.Controllers
                 
                 if (result.Succeeded)
                 {
+                    _logger.LogInformation("User created a new account with password");
+                    
                     if (!_roleManager.RoleExistsAsync("User").GetAwaiter().GetResult())
                     {
                         var userRole = new ApplicationRole
@@ -422,7 +430,7 @@ namespace IdsTemp.MainModule.Controllers
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        /*[HttpGet]
+        [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPassword()
         {
@@ -436,7 +444,7 @@ namespace IdsTemp.MainModule.Controllers
         {
             if (ModelState.IsValid)
             {
-                TUser user = null;
+                ApplicationUser user = null;
                 switch (model.Policy)
                 {
                     case LoginResolutionPolicy.Email:
@@ -466,7 +474,7 @@ namespace IdsTemp.MainModule.Controllers
 
                 if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
                 {
-                    // Don't reveal that the user does not exist
+                    // Don't reveal that the user does not exist or is not confirmed
                     return View("ForgotPasswordConfirmation");
                 }
 
@@ -474,7 +482,7 @@ namespace IdsTemp.MainModule.Controllers
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
 
-                await _emailSender.SendEmailAsync(user.Email, _localizer["ResetPasswordTitle"], _localizer["ResetPasswordBody", HtmlEncoder.Default.Encode(callbackUrl)]);
+                await _emailSender.SendEmailAsync(user.Email, "Reset Password", $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                 return View("ForgotPasswordConfirmation");
             }
@@ -530,9 +538,14 @@ namespace IdsTemp.MainModule.Controllers
         public IActionResult ForgotPasswordConfirmation()
         {
             return View();
-        }*/
+        }
         
-        
+        [HttpGet]
+        public IActionResult Lockout(string returnUrl = null)
+        {
+            ViewData["returnUrl"] =  returnUrl;
+            return View();
+        }
         
         /*[AcceptVerbs("Get", "Post")]
         public async Task<IActionResult> CheckEmail(string email)

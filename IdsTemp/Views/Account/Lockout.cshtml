@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Locked out";
+    var returnUrl = (string)ViewData["returnUrl"];
+}
+
+<h2 class="auth-heading">@ViewData["Title"]</h2>
+<div class="admin-page">
+
+    <p class="text-danger text-center">This account has been locked out, please try again later.</p>
+    @if (returnUrl != "" || returnUrl != null)
+    {
+        <a href="@Url.Action("Login", new { returnUrl })"
+           class="auth-link">
+            Back to login
+        </a>
+    }
+</div>

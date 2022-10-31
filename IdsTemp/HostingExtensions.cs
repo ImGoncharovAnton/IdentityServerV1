@@ -61,6 +61,9 @@ internal static class HostingExtensions
                 opt.Password.RequiredLength = 6;
                 opt.SignIn.RequireConfirmedAccount = true;
                 opt.User.RequireUniqueEmail = true;
+                opt.Lockout.AllowedForNewUsers = true;
+                opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                opt.Lockout.MaxFailedAccessAttempts = 3;
                 opt.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -180,8 +183,6 @@ internal static class HostingExtensions
         app.UseAuthentication();
         app.UseAuthorization();
         
-        // app.MapRazorPages()
-        //     .RequireAuthorization();
 
         app.UseEndpoints(endpoints =>
         {

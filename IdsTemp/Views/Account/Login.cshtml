@@ -1,5 +1,5 @@
 @model IdsTemp.Models.Account.LoginViewModel
-<partial name="_ValidationSummary"/>
+@await Html.PartialAsync("_ValidationSummary")
 <div class="auth-page">
 
     @if (Model.EnableLocalLogin)
@@ -51,8 +51,10 @@
                 </button>
             </form>
 
-            <a href="@Url.Action("Register", new { Model.ReturnUrl })"
-               class="auth-link">
+            <a asp-controller="Account" asp-action="ForgotPassword" value="forgot" class="auth-link">
+                Forgot password
+            </a>
+            <a href="@Url.Action("Register", new { Model.ReturnUrl })" class="auth-link">
                 Create account
             </a>
         </div>
