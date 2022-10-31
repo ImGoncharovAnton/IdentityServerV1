@@ -68,7 +68,8 @@ internal static class HostingExtensions
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders()
-            .AddTokenProvider<EmailConfirmationTokenProvider<ApplicationUser>>("emailconfirmation");
+            .AddTokenProvider<EmailConfirmationTokenProvider<ApplicationUser>>("emailconfirmation")
+            .AddPasswordValidator<CustomPasswordValidator<ApplicationUser>>();
 
         builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
         {
