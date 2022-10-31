@@ -719,6 +719,8 @@ body a:hover {
 
 .not-auth-cards {
     gap: 1.5rem;
+    max-width: 992px;
+    margin: 0 auto;
 }
 
 @media screen and (max-width: 992px) {

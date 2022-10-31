@@ -145,9 +145,19 @@ namespace IdsTemp.MainModule.Controllers
                 {
                     return RedirectToAction("Lockout", new {model.ReturnUrl});
                 }
+
+                if (result.IsNotAllowed)
+                {
+                    var notAllowedUser = await _userManager.FindByNameAsync(model.Username);
+                    if (notAllowedUser.EmailConfirmed)
+                        ModelState.AddModelError(String.Empty, "Access not allowed");
+                    
+                    ModelState.AddModelError(String.Empty, "Access not allowed, check email is verified");
+                }
                
                 await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId:context?.Client.ClientId));
-                ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
+                if (!result.IsNotAllowed)
+                    ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
                 // foreach (var error in result.Errors)
                 // {
                 //     ModelState.AddModelError(string.Empty, error.Description);
