@@ -24,9 +24,12 @@
                             </a>
 
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="" asp-action="Logout" asp-controller="Account">Logout</a>
-                                <a class="dropdown-item" asp-area="" asp-action="Index" asp-controller="Manage">Manage</a>
-                                <a class="dropdown-item" asp-area="" asp-action="Index" asp-controller="Diagnostics">Diagnostics</a>
+                                <a class="dropdown-item" asp-area="" asp-action="Index" asp-controller="Manage">Profile</a>
+                                <a class="dropdown-item" asp-area="" asp-action="PersonalData" asp-controller="Manage">My personal data</a>
+                                <a class="dropdown-item" asp-area="" asp-action="Index" asp-controller="Manage">Two-factor authentication</a>
+                                <a class="dropdown-item" asp-area="" asp-action="Index" asp-controller="Grants">Persisted grants</a>
+                                <a class="dropdown-item" asp-area="" asp-action="ChangePassword" asp-controller="Manage">Change password</a>
+                                <a class="dropdown-item" asp-area="" asp-action="Index" asp-controller="Settings">Settings</a>
                             </div>
                         </li>
                     }

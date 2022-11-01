@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json;
 
 namespace IdsTemp.MainModule.Controllers;
 
@@ -192,6 +193,90 @@ public class ManageController : Controller
         StatusMessage = "Password set";
 
         return RedirectToAction(nameof(SetPassword));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> PersonalData()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+        
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DownloadPersonalData()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+        _logger.LogInformation("User with ID '{UserId}' asked for their personal data", _userManager.GetUserId(User));
+        
+        // Only include personal data for download
+        var personalDataProps = typeof(ApplicationUser).GetProperties().Where(
+            prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));
+        var personalData = personalDataProps.ToDictionary(p => p.Name, p => p.GetValue(user)?.ToString() ?? "null");
+
+        var logins = await _userManager.GetLoginsAsync(user);
+        foreach (var l in logins)
+        {
+            personalData.Add($"{l.LoginProvider} external login provider key", l.ProviderKey);
+        }
+
+        personalData.Add($"Authenticator Key", await _userManager.GetAuthenticatorKeyAsync(user));
+
+        Response.Headers.Add("Content-Disposition", "attachment; filename=PersonalData.json");
+        return new FileContentResult(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(personalData)), "text/json");
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> DeletePersonalData()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+        var deletePersonalDataViewModel = new DeletePersonalDataViewModel
+        {
+            RequirePassword = await _userManager.HasPasswordAsync(user)
+        };
+
+        return View(deletePersonalDataViewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeletePersonalData(DeletePersonalDataViewModel deletePersonalDataViewModel)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+        deletePersonalDataViewModel.RequirePassword = await _userManager.HasPasswordAsync(user);
+        if (deletePersonalDataViewModel.RequirePassword)
+        {
+            if (!await _userManager.CheckPasswordAsync(user, deletePersonalDataViewModel.Password))
+            {
+                ModelState.AddModelError(string.Empty, "Password is not correct");
+                return View(deletePersonalDataViewModel);
+            }
+        }
+
+        var result = await _userManager.DeleteAsync(user);
+        var userId = await _userManager.GetUserIdAsync(user);
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Unexpected error occurred deleting user | userId: {user.Id}");
+        }
+
+        await _signInManager.SignOutAsync();
+
+        _logger.LogInformation("User with ID '{UserId}' deleted themselves", userId);
+
+        return Redirect("~/");
     }
     
     /*Helpers for Manage*/

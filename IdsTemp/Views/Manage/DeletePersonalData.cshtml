@@ -1,0 +1,26 @@
+﻿@model IdsTemp.Models.Manage.DeletePersonalDataViewModel
+
+@{
+    ViewData["Title"] = "Delete Personal Data";
+}
+
+<h2 class="common-heading">@ViewData["Title"]</h2>
+
+<div class="admin-page">
+    <div class="alert alert-danger" role="alert">
+        <span class="bi bi-exclamation-triangle"></span>
+        <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+    </div>
+     <form id="delete-user" method="post" class="form-group">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            @if (Model.RequirePassword)
+            {
+                <div class="form-group">
+                    <label asp-for="Password">Password</label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+            }
+            <button class="btn btn-danger" type="submit">Delete data and close my account</button>
+        </form>
+</div>

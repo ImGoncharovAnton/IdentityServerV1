@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Personal Data";
+}
+
+<h2 class="common-heading">@ViewData["Title"]</h2>
+
+<div class="admin-page common-form">
+    <div class="alert alert-info" role="alert">
+        Your account contains personal data that you have given us. This page allows you to download or delete that data.
+    </div>
+    <form asp-action="DownloadPersonalData" method="post" class="form-group">
+        <button class="auth-button flex-cc" type="submit">Download</button>
+    </form>
+    <div class="alert alert-danger" role="alert">
+        Deleting this data will permanently remove your account, and this cannot be recovered.
+    </div>
+    <div>
+        <a asp-action="DeletePersonalData" class="auth-button flex-cc" style="background-color: red">Delete</a>
+    </div>
+</div>
