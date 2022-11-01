@@ -17,12 +17,15 @@ namespace IdsTemp.MainModule.Controllers;
 public class ManageController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
+
     private readonly SignInManager<ApplicationUser> _signInManager;
+
     // private readonly IEmailSender _emailSender;
     private readonly ILogger<ManageController> _logger;
     private readonly UrlEncoder _urlEncoder;
     private readonly IEmailSender _emailSender;
 
+    private const string RecoveryCodesKey = nameof(RecoveryCodesKey);
     private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
     [TempData] public string StatusMessage { get; set; }
@@ -201,7 +204,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
             return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-        
+
         return View();
     }
 
@@ -214,7 +217,7 @@ public class ManageController : Controller
             return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
 
         _logger.LogInformation("User with ID '{UserId}' asked for their personal data", _userManager.GetUserId(User));
-        
+
         // Only include personal data for download
         var personalDataProps = typeof(ApplicationUser).GetProperties().Where(
             prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));
@@ -231,7 +234,7 @@ public class ManageController : Controller
         Response.Headers.Add("Content-Disposition", "attachment; filename=PersonalData.json");
         return new FileContentResult(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(personalData)), "text/json");
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> DeletePersonalData()
     {
@@ -278,7 +281,212 @@ public class ManageController : Controller
 
         return Redirect("~/");
     }
-    
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GenerateRecoveryCodes()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+        if (!user.TwoFactorEnabled)
+        {
+            AddError("Cannot generate recovery codes for user as they do not have 2FA enabled.");
+            return View();
+        }
+
+        var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+        
+        var userId = await _userManager.GetUserIdAsync(user);
+        _logger.LogInformation("User with ID '{UserId}' has generated new 2FA recovery codes", userId);
+        StatusMessage = "You have generated new recovery codes.";
+
+        var model = new ShowRecoveryCodesViewModel { RecoveryCodes = recoveryCodes.ToArray() };
+
+        return View(nameof(ShowRecoveryCodes), model);
+    }
+
+    [HttpGet]
+    public IActionResult ShowRecoveryCodes()
+    {
+        var recoveryCodes = (string[])TempData[RecoveryCodesKey];
+        if (recoveryCodes == null)
+        {
+            return RedirectToAction(nameof(TwoFactorAuthentication));
+        }
+
+        var model = new ShowRecoveryCodesViewModel { RecoveryCodes = recoveryCodes };
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> TwoFactorAuthentication()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+        var model = new TwoFactorAuthenticationViewModel
+        {
+            HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
+            Is2FaEnabled = user.TwoFactorEnabled,
+            RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user),
+            IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user)
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ForgetTwoFactorClient()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+        await _signInManager.ForgetTwoFactorClientAsync();
+
+        StatusMessage =
+            "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code";
+
+        return RedirectToAction(nameof(TwoFactorAuthentication));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Disable2FaWarning()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+        if (!user.TwoFactorEnabled)
+            throw new InvalidOperationException($"Cannot disable 2FA for user as it's not currently enabled.");
+
+        return View(nameof(Disable2Fa));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Disable2Fa()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+        var disable2FaResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
+        if (!disable2FaResult.Succeeded)
+            throw new InvalidOperationException($"Unexpected error occurred disabling 2FA.");
+
+        _logger.LogInformation("User with ID '{UserId}' has disabled 2fa", _userManager.GetUserId(User));
+        StatusMessage = "2fa has been disabled. You can reenable 2fa when you setup an authenticator app";
+
+        return RedirectToAction(nameof(TwoFactorAuthentication));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetAuthenticator()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+        await _userManager.SetTwoFactorEnabledAsync(user, false);
+        await _userManager.ResetAuthenticatorKeyAsync(user);
+        var userId = await _userManager.GetUserIdAsync(user);
+
+        _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key", userId);
+
+        await _signInManager.RefreshSignInAsync(user);
+        ViewData["StatusMessage"] = "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.";
+
+        return RedirectToAction(nameof(EnableAuthenticator));
+    }
+
+    [HttpGet]
+    public IActionResult ResetAuthenticatorWarning()
+    {
+        return View(nameof(ResetAuthenticator));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EnableAuthenticator()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+        }
+
+        var model = new EnableAuthenticatorViewModel();
+        await LoadSharedKeyAndQrCodeUriAsync(user, model);
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EnableAuthenticator(EnableAuthenticatorViewModel model)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            await LoadSharedKeyAndQrCodeUriAsync(user, model);
+            return View(model);
+        }
+
+        var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+        var is2FaTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
+            user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
+
+        if (!is2FaTokenValid)
+        {
+            ModelState.AddModelError("ErrorCode", "Verification code is invalid");
+            await LoadSharedKeyAndQrCodeUriAsync(user, model);
+            return View(model);
+        }
+
+        await _userManager.SetTwoFactorEnabledAsync(user, true);
+        var userId = await _userManager.GetUserIdAsync(user);
+
+        _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app", userId);
+
+        StatusMessage = "Your authenticator app has been verified.";
+
+        if (await _userManager.CountRecoveryCodesAsync(user) == 0)
+        {
+            var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+            TempData[RecoveryCodesKey] = recoveryCodes.ToArray();
+
+            return RedirectToAction(nameof(ShowRecoveryCodes));
+        }
+
+        return RedirectToAction(nameof(TwoFactorAuthentication));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GenerateRecoveryCodesWarning()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+        if (!user.TwoFactorEnabled)
+            throw new InvalidOperationException(
+                $"Cannot generate recovery codes for user because they do not have 2FA enabled.");
+
+        return View(nameof(GenerateRecoveryCodes));
+    }
+
+
     /*Helpers for Manage*/
     private async Task<ProfileViewModel> BuildManageIndexViewModelAsync(ApplicationUser user)
     {
@@ -332,7 +540,48 @@ public class ManageController : Controller
             await _userManager.ReplaceClaimAsync(user, pair.Item1, pair.Item2);
         }
     }
-    
+
+    private async Task LoadSharedKeyAndQrCodeUriAsync(ApplicationUser user, EnableAuthenticatorViewModel model)
+    {
+        var unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
+        if (string.IsNullOrEmpty(unformattedKey))
+        {
+            await _userManager.ResetAuthenticatorKeyAsync(user);
+            unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
+        }
+
+        model.SharedKey = FormatKey(unformattedKey);
+        model.AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey);
+    }
+
+    private string FormatKey(string unformattedKey)
+    {
+        var result = new StringBuilder();
+        var currentPosition = 0;
+
+        while (currentPosition + 4 < unformattedKey.Length)
+        {
+            result.Append(unformattedKey.Substring(currentPosition, 4)).Append(" ");
+            currentPosition += 4;
+        }
+
+        if (currentPosition < unformattedKey.Length)
+        {
+            result.Append(unformattedKey.Substring(currentPosition));
+        }
+
+        return result.ToString().ToLowerInvariant();
+    }
+
+    private string GenerateQrCodeUri(string email, string unformattedKey)
+    {
+        return string.Format(
+            AuthenticatorUriFormat,
+            _urlEncoder.Encode("IdServer.STS.Identity"),
+            _urlEncoder.Encode(email),
+            unformattedKey);
+    }
+
     private void AddErrors(IdentityResult result)
     {
         foreach (var error in result.Errors)

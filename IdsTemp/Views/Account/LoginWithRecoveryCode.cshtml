@@ -1,0 +1,23 @@
+﻿@model IdsTemp.Models.Account.LoginWithRecoveryCodeViewModel
+
+@{
+    ViewData["Title"] = "Recovery code verification";
+}
+
+<h2 class="common-heading">@ViewData["Title"]</h2>
+
+<div class="admin-page">
+    <p>
+        You have requested to log in with a recovery code.
+        This login will not be remembered until you providean authenticator app code at log in or disable 2FA and log in again.
+    </p>
+    <form method="post">
+        <input asp-for="ReturnUrl" type="hidden"/>
+        <div class="form-group">
+            <label asp-for="RecoveryCode">Recovery Code</label>
+            <input asp-for="RecoveryCode" class="common-input" autocomplete="off" autofocus/>
+            <span asp-validation-for="RecoveryCode" class="text-danger"></span>
+        </div>
+        <button type="submit" class="auth-button flex-cc">Log in</button>
+    </form>
+</div>

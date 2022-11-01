@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace IdsTemp.MainModule.Controllers
 {
-    
     [AllowAnonymous]
     public class AccountController : Controller
     {
@@ -40,8 +39,8 @@ namespace IdsTemp.MainModule.Controllers
             IEventService events,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            RoleManager<ApplicationRole> roleInManager, 
-            IEmailSender emailSender, 
+            RoleManager<ApplicationRole> roleInManager,
+            IEmailSender emailSender,
             ILogger<AccountController> logger)
         {
             // if the TestUserStore is not in DI, then we'll just use the global users collection
@@ -114,13 +113,14 @@ namespace IdsTemp.MainModule.Controllers
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password,
+                    model.RememberLogin, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(model.Username);
                     await _events.RaiseAsync(
                         new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName,
-                        clientId: context?.Client.ClientId));
+                            clientId: context?.Client.ClientId));
 
                     if (context != null)
                     {
@@ -140,10 +140,16 @@ namespace IdsTemp.MainModule.Controllers
                         throw new Exception("invalid return url");
                     }
                 }
-                
+
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToAction(nameof(LoginWith2Fa),
+                        new { model.ReturnUrl, RememberMe = model.RememberLogin });
+                }
+
                 if (result.IsLockedOut)
                 {
-                    return RedirectToAction("Lockout", new {model.ReturnUrl});
+                    return RedirectToAction("Lockout", new { model.ReturnUrl });
                 }
 
                 if (result.IsNotAllowed)
@@ -151,11 +157,12 @@ namespace IdsTemp.MainModule.Controllers
                     var notAllowedUser = await _userManager.FindByNameAsync(model.Username);
                     if (notAllowedUser.EmailConfirmed)
                         ModelState.AddModelError(String.Empty, "Access not allowed");
-                    
+
                     ModelState.AddModelError(String.Empty, "Access not allowed, check email is verified");
                 }
-               
-                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId:context?.Client.ClientId));
+
+                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials",
+                    clientId: context?.Client.ClientId));
                 if (!result.IsNotAllowed)
                     ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
                 // foreach (var error in result.Errors)
@@ -169,7 +176,7 @@ namespace IdsTemp.MainModule.Controllers
             return View(vm);
         }
 
-       
+
         /// <summary>
         /// Show logout page
         /// </summary>
@@ -238,13 +245,12 @@ namespace IdsTemp.MainModule.Controllers
             return View(vm);
         }
 
-       
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string button, string returnUrl = null)
         {
-            
             // the user clicked the "cancel" button
             if (button == "cancel")
             {
@@ -258,6 +264,7 @@ namespace IdsTemp.MainModule.Controllers
                     return Redirect("~/");
                 }
             }
+
             returnUrl ??= Url.Content("~/");
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -279,7 +286,7 @@ namespace IdsTemp.MainModule.Controllers
                 if (char.IsDigit(c))
                     hasNotDigit = true;
             }
-            
+
             if (!hasNotSymbol)
                 ModelState.AddModelError(String.Empty, "Password mush have at least one non alphanumeric character");
             if (!hasNotLower)
@@ -290,10 +297,9 @@ namespace IdsTemp.MainModule.Controllers
                 ModelState.AddModelError(String.Empty, "Password mush have at least one digit ('0'-'9')");
 
             #endregion
-            
+
             if (ModelState.IsValid)
             {
-
                 var user = new ApplicationUser
                 {
                     UserName = model.Username,
@@ -316,34 +322,34 @@ namespace IdsTemp.MainModule.Controllers
 
 
                 var result = await _userManager.CreateAsync(user, model.Password);
-                
+
                 /*Email confirm*/
-                
+
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password");
-                    
+
                     if (!_roleManager.RoleExistsAsync("User").GetAwaiter().GetResult())
                     {
                         var userRole = new ApplicationRole
                         {
                             Name = "User",
                             NormalizedName = "User",
-                    
                         };
                         await _roleManager.CreateAsync(userRole);
                     }
-                    
+
                     await _userManager.AddToRoleAsync(user, "User");
-                    
-                    
+
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code, returnUrl = returnUrl }, HttpContext.Request.Scheme);
-                
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account",
+                        new { userId = user.Id, code = code, returnUrl = returnUrl }, HttpContext.Request.Scheme);
+
                     await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-                
+
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return View("RegisterConfirmation");
@@ -354,7 +360,7 @@ namespace IdsTemp.MainModule.Controllers
                         return RedirectToLocal(returnUrl);
                     }
                 }
-                
+
                 AddErrors(result);
 
                 #region old temp custom register for identity
@@ -408,15 +414,13 @@ namespace IdsTemp.MainModule.Controllers
                 }*/
 
                 #endregion
-                
-                
             }
 
             // If we got this far, something failed, redisplay form
-            
+
             return View(model);
         }
-        
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code, string returnUrl = null)
@@ -425,6 +429,7 @@ namespace IdsTemp.MainModule.Controllers
             {
                 return View("Error");
             }
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
@@ -432,11 +437,11 @@ namespace IdsTemp.MainModule.Controllers
             }
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-            
+
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            
-            ViewData["returnUrl"] =  returnUrl;
-            
+
+            ViewData["returnUrl"] = returnUrl;
+
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
@@ -465,9 +470,12 @@ namespace IdsTemp.MainModule.Controllers
                         catch (Exception ex)
                         {
                             // in case of multiple users with the same email this method would throw and reveal that the email is registered
-                            _logger.LogError("Error retrieving user by email ({0}) for forgot password functionality: {1}", model.Email, ex.Message);
+                            _logger.LogError(
+                                "Error retrieving user by email ({0}) for forgot password functionality: {1}",
+                                model.Email, ex.Message);
                             user = null;
                         }
+
                         break;
                     case LoginResolutionPolicy.Username:
                         try
@@ -476,9 +484,12 @@ namespace IdsTemp.MainModule.Controllers
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("Error retrieving user by userName ({0}) for forgot password functionality: {1}", model.Username, ex.Message);
+                            _logger.LogError(
+                                "Error retrieving user by userName ({0}) for forgot password functionality: {1}",
+                                model.Username, ex.Message);
                             user = null;
                         }
+
                         break;
                 }
 
@@ -490,9 +501,11 @@ namespace IdsTemp.MainModule.Controllers
 
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code },
+                    HttpContext.Request.Scheme);
 
-                await _emailSender.SendEmailAsync(user.Email, "Reset Password", $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                await _emailSender.SendEmailAsync(user.Email, "Reset Password",
+                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                 return View("ForgotPasswordConfirmation");
             }
@@ -516,6 +529,7 @@ namespace IdsTemp.MainModule.Controllers
             {
                 return View(model);
             }
+
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
@@ -549,14 +563,127 @@ namespace IdsTemp.MainModule.Controllers
         {
             return View();
         }
-        
+
         [HttpGet]
         public IActionResult Lockout(string returnUrl = null)
         {
-            ViewData["returnUrl"] =  returnUrl;
+            ViewData["returnUrl"] = returnUrl;
             return View();
         }
-        
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWithRecoveryCode(string returnUrl = null)
+        {
+            // Ensure the user has gone through the username & password screen first
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+
+            var model = new LoginWithRecoveryCodeViewModel()
+            {
+                ReturnUrl = returnUrl
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWithRecoveryCode(LoginWithRecoveryCodeViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+
+            var recoveryCode = model.RecoveryCode.Replace(" ", string.Empty);
+
+            var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
+
+            var userId = await _userManager.GetUserIdAsync(user);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code", userId);
+                return LocalRedirect(string.IsNullOrEmpty(model.ReturnUrl) ? "~/" : model.ReturnUrl);
+            }
+
+            if (result.IsLockedOut)
+            {
+                _logger.LogWarning("User account locked out");
+                return View("Lockout");
+            }
+
+            _logger.LogWarning("Invalid recovery code entered for user with ID '{UserId}' ", userId);
+            ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
+
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWith2Fa(bool rememberMe, string returnUrl = null)
+        {
+            // Ensure the user has gone through the username & password screen first
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
+            if (user == null)
+                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+
+            var model = new LoginWith2FaViewModel()
+            {
+                ReturnUrl = returnUrl,
+                RememberMe = rememberMe
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoginWith2Fa(LoginWith2FaViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+
+            var authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+            var result =
+                await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, model.RememberMe,
+                    model.RememberMachine);
+
+            var userId = await _userManager.GetUserIdAsync(user);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa", userId);
+                return LocalRedirect(string.IsNullOrEmpty(model.ReturnUrl) ? "~/" : model.ReturnUrl);
+            }
+
+            if (result.IsLockedOut)
+            {
+                _logger.LogWarning("User with ID '{UserId}' account locked out", userId);
+                return View("Lockout");
+            }
+
+            _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'", user.Id);
+            ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+
+            return View(model);
+        }
+
         /*[AcceptVerbs("Get", "Post")]
         public async Task<IActionResult> CheckEmail(string email)
         {
@@ -564,11 +691,11 @@ namespace IdsTemp.MainModule.Controllers
 
             return Json(existEmail == null);
         }*/
-       
+
         /*****************************************/
         /* helper APIs for the AccountController */
         /*****************************************/
-        
+
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -576,7 +703,7 @@ namespace IdsTemp.MainModule.Controllers
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
-        
+
         private IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
@@ -586,8 +713,8 @@ namespace IdsTemp.MainModule.Controllers
 
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
-        
-         private async Task<RegisterViewModel> BuildRegisterViewModelAsync(string returnUrl)
+
+        private async Task<RegisterViewModel> BuildRegisterViewModelAsync(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
             List<string> roles = new List<string>();
@@ -634,7 +761,8 @@ namespace IdsTemp.MainModule.Controllers
 
                     if (client.IdentityProviderRestrictions != null && client.IdentityProviderRestrictions.Any())
                     {
-                        providers = providers.Where(provider => client.IdentityProviderRestrictions.Contains(provider.AuthenticationScheme)).ToList();
+                        providers = providers.Where(provider =>
+                            client.IdentityProviderRestrictions.Contains(provider.AuthenticationScheme)).ToList();
                     }
                 }
             }
@@ -648,7 +776,7 @@ namespace IdsTemp.MainModule.Controllers
                 ExternalProviders = providers.ToArray()
             };
         }
-        
+
         private async Task<LoginViewModel> BuildLoginViewModelAsync(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
@@ -692,7 +820,8 @@ namespace IdsTemp.MainModule.Controllers
 
                     if (client.IdentityProviderRestrictions != null && client.IdentityProviderRestrictions.Any())
                     {
-                        providers = providers.Where(provider => client.IdentityProviderRestrictions.Contains(provider.AuthenticationScheme)).ToList();
+                        providers = providers.Where(provider =>
+                            client.IdentityProviderRestrictions.Contains(provider.AuthenticationScheme)).ToList();
                     }
                 }
             }
@@ -758,7 +887,8 @@ namespace IdsTemp.MainModule.Controllers
                 var idp = User.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
                 if (idp != null && idp != Duende.IdentityServer.IdentityServerConstants.LocalIdentityProvider)
                 {
-                    var providerSupportsSignout = await Helpers.Extensions.GetSchemeSupportsSignOutAsync(HttpContext, idp);
+                    var providerSupportsSignout =
+                        await Helpers.Extensions.GetSchemeSupportsSignOutAsync(HttpContext, idp);
                     if (providerSupportsSignout)
                     {
                         if (vm.LogoutId == null)

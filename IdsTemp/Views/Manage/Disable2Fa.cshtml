@@ -1,0 +1,23 @@
+﻿@{
+   ViewData["Title"] = "Disable two-factor authentication (2FA)";
+}
+
+@* <partial name="_StatusMessage" for="StatusMessage" /> *@
+
+<h2 class="common-heading">@ViewData["Title"]</h2>
+
+<div class="admin-page">
+   <div class="alert alert-warning">
+      <p>
+         <span class="bi bi-exclamation-triangle"></span>
+         <strong>This action only disables 2FA</strong>
+      </p>
+      <p>
+         Disabling 2FA does not change the keys used in authenticator apps. If you wish to change the key used in an authenticator app you should
+         <a asp-action="ResetAuthenticatorWarning"></a>
+      </p>
+   </div>
+   <form asp-action="Disable2Fa" method="post">
+      <button class="auth-button flex-cc" type="submit" style="background-color: red">Disable 2FA</button>
+   </form>
+</div>
