@@ -4,6 +4,7 @@ using IdServer.STS.Identity.Helpers;
 using IdsTemp.Helpers;
 using IdsTemp.Models;
 using IdsTemp.Models.Manage;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -416,9 +417,7 @@ public class ManageController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
-        {
             return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-        }
 
         var model = new EnableAuthenticatorViewModel();
         await LoadSharedKeyAndQrCodeUriAsync(user, model);
@@ -432,9 +431,7 @@ public class ManageController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
-        {
             return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-        }
 
         if (!ModelState.IsValid)
         {
@@ -486,6 +483,85 @@ public class ManageController : Controller
         return View(nameof(GenerateRecoveryCodes));
     }
 
+    [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveLogin(RemoveLoginViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+            var result = await _userManager.RemoveLoginAsync(user, model.LoginProvider, model.ProviderKey);
+            if (!result.Succeeded)
+                throw new ApplicationException($"Unexpected error occurred removing external login for user with ID: {user.Id}");
+
+            await _signInManager.RefreshSignInAsync(user);
+            StatusMessage = "The external login was removed";
+
+            return RedirectToAction(nameof(ExternalLogins));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LinkLoginCallback()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+            var info = await _signInManager.GetExternalLoginInfoAsync(user.Id.ToString());
+            if (info == null)
+                throw new ApplicationException($"Unexpected error occurred loading external login info for user with ID: {user.Id}.");
+
+            var result = await _userManager.AddLoginAsync(user, info);
+            if (!result.Succeeded)
+            {
+                AddErrors(result);
+                return View("LinkLoginFailure");
+            }
+
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            StatusMessage = "The external login was added";
+
+            return RedirectToAction(nameof(ExternalLogins));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExternalLogins()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+
+            var model = new ExternalLoginsViewModel
+            {
+                CurrentLogins = await _userManager.GetLoginsAsync(user)
+            };
+
+            model.OtherLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())
+                .Where(auth => model.CurrentLogins.All(ul => auth.Name != ul.LoginProvider))
+                .ToList();
+
+            model.ShowRemoveButton = await _userManager.HasPasswordAsync(user) || model.CurrentLogins.Count > 1;
+            model.StatusMessage = StatusMessage;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LinkLogin(string provider)
+        {
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
+            // Request a redirect to the external login provider to link a login for the current user
+            var redirectUrl = Url.Action(nameof(LinkLoginCallback));
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _userManager.GetUserId(User));
+
+            return new ChallengeResult(provider, properties);
+        }
+    
 
     /*Helpers for Manage*/
     private async Task<ProfileViewModel> BuildManageIndexViewModelAsync(ApplicationUser user)

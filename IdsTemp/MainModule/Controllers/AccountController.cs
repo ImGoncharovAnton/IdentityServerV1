@@ -570,6 +570,101 @@ namespace IdsTemp.MainModule.Controllers
             ViewData["returnUrl"] = returnUrl;
             return View();
         }
+        
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        {
+            if (remoteError != null)
+            {
+                ModelState.AddModelError(string.Empty, $"Error external provider, {remoteError}");
+
+                return View(nameof(Login));
+            }
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Sign in the user with this external login provider if the user already has a login.
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            if (result.Succeeded)
+            {
+                return RedirectToLocal(returnUrl);
+            }
+            if (result.RequiresTwoFactor)
+            {
+                return RedirectToAction(nameof(LoginWith2Fa), new { ReturnUrl = returnUrl });
+            }
+            if (result.IsLockedOut)
+            {
+                return View("Lockout");
+            }
+
+            // If the user does not have an account, then ask the user to create an account.
+            ViewData["ReturnUrl"] = returnUrl;
+            ViewData["LoginProvider"] = info.LoginProvider;
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var userName = info.Principal.Identity.Name;
+
+            return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email, UserName = userName });
+        }
+
+        [HttpPost]
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ExternalLogin(string provider, string returnUrl = null)
+        {
+            // Request a redirect to the external login provider.
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+            return Challenge(properties, provider);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl = null)
+        {
+            returnUrl = returnUrl ?? Url.Content("~/");
+
+            // Get the information about the user from the external login provider
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return View("ExternalLoginFailure");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email
+                };
+
+                var result = await _userManager.CreateAsync(user);
+                if (result.Succeeded)
+                {
+                    result = await _userManager.AddLoginAsync(user, info);
+                    if (result.Succeeded)
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+
+                        return RedirectToLocal(returnUrl);
+                    }
+                }
+
+                AddErrors(result);
+            }
+
+            ViewData["LoginProvider"] = info.LoginProvider;
+            ViewData["ReturnUrl"] = returnUrl;
+
+            return View(model);
+        }
 
         [HttpGet]
         [AllowAnonymous]
