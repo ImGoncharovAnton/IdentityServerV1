@@ -9,12 +9,15 @@
         Your account contains personal data that you have given us. This page allows you to download or delete that data.
     </div>
     <form asp-action="DownloadPersonalData" method="post" class="form-group">
-        <button class="auth-button flex-cc" type="submit">Download</button>
+        <div class="common-block-buttons">
+            <button class="common-button" type="submit">Download</button>
+        </div>
+        
     </form>
     <div class="alert alert-danger" role="alert">
         Deleting this data will permanently remove your account, and this cannot be recovered.
     </div>
-    <div>
-        <a asp-action="DeletePersonalData" class="auth-button flex-cc" style="background-color: red">Delete</a>
+     <div class="common-block-buttons">
+        <a asp-action="DeletePersonalData" class="common-button flex-cc danger-button">Delete</a>
     </div>
 </div>

@@ -5,6 +5,10 @@
     --light-gray-color: #DADADA;
 }
 
+ul, ol, dl {
+    margin-bottom: 0;
+}
+
 body {
     color: var(--main-color)
 }
@@ -407,12 +411,13 @@ body a:hover {
 }
 
 .common-button {
-    padding: 1.2rem;
+    padding: 1rem;
     background-color: var(--light-green-color);
     border: none;
     border-radius: 3px;
     transition: all .15s ease-in-out;
     color: var(--light-gray-color);
+    min-width: 6rem;
 }
 
 .common-button:hover {
@@ -691,6 +696,14 @@ body a:hover {
 }
 
 @media screen and (max-width: 576px) {
+    .auth-navbar {
+        flex-direction: column;
+    }
+    .auth-nav-container {
+        flex-direction: column;
+        margin-bottom: 1rem;
+    }
+    
     .admin-cards {
         grid-template-columns: 1fr;
     }

@@ -9,6 +9,10 @@
     --box-shadow-dark: 0 0 5px var(--text-color);
 }
 
+ul, ol, dl {
+    margin-bottom: 0;
+}
+
 body {
     background-color: var(--main-color);
     color: var(--text-color);
@@ -347,10 +351,8 @@ body a:hover {
 
 .logout-button {
     flex-direction: column;
-    height: 2.5rem;
     min-width: 250px;
     max-width: 300px;
-    margin-bottom: 1rem;
 }
 
 /* Common*/
@@ -383,6 +385,13 @@ body a:hover {
 
 .block-buttons {
     height: 2.5rem;
+}
+
+.common-block-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
 }
 
 .search-input {
@@ -461,7 +470,7 @@ body a:hover {
 }
 
 .common-button {
-    padding: 1.2rem;
+    padding: 1rem;
     background-color: var(--blue-color);
     border: none;
     border-radius: 3px;
@@ -469,6 +478,7 @@ body a:hover {
     color: var(--text-color);
     text-decoration: none;
     box-shadow: var(--box-shadow-dark);
+    min-width: 6rem;
 }
 
 .common-button:hover {
@@ -495,6 +505,15 @@ body a:hover {
     box-shadow: var(--box-shadow-blue);
     color: var(--light-blue-color);
     background-color: var(--main-color);
+}
+
+.danger-button {
+    background-color: var(--light-color);
+}
+
+.danger-button:hover {
+    background-color: var(--main-color);
+    color: var(--text-color);
 }
 
 .top-bar {
@@ -754,6 +773,14 @@ body a:hover {
 }
 
 @media screen and (max-width: 576px) {
+    .auth-navbar {
+        flex-direction: column;
+    }
+    .auth-nav-container {
+        flex-direction: column;
+        margin-bottom: 1rem;
+    }
+    
     .not-auth-cards {
         flex-direction: column;
     }
@@ -778,5 +805,13 @@ body a:hover {
         flex-direction: column;
         width: 100%;
         align-items: center;
+    }
+
+    .common-block-buttons {
+        flex-direction: column;
+    }
+
+    .common-block-buttons .common-button, form {
+        width: 100%;
     }
 }

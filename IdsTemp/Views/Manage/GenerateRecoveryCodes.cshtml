@@ -6,7 +6,7 @@
 
 <h2 class="common-heading">@ViewData["Title"]</h2>
 
-<div class="admin-page">
+<div class="admin-page common-form">
     <div class="alert alert-warning" role="alert">
         <p>
             <span class="bi bi-exclamation-triangle"></span>
@@ -21,6 +21,8 @@
         </p>
     </div>
     <form asp-action="GenerateRecoveryCodes" method="post" class="form-group">
-        <button class="btn btn-danger" type="submit">Generate Recovery Codes</button>
+        <div class="common-block-buttons">
+             <button class="common-button danger-button" type="submit">Generate Recovery Codes</button>
+        </div>
     </form>
 </div>

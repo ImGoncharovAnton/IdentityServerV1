@@ -6,7 +6,7 @@
 
 <h2 class="common-heading">@ViewData["Title"]</h2>
 
-<div class="admin-page">
+<div class="admin-page common-form">
     <div class="alert alert-danger" role="alert">
         <span class="bi bi-exclamation-triangle"></span>
         <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
@@ -17,10 +17,13 @@
             {
                 <div class="form-group">
                     <label asp-for="Password">Password</label>
-                    <input asp-for="Password" class="form-control" />
+                    <input asp-for="Password" class="common-input" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
             }
-            <button class="btn btn-danger" type="submit">Delete data and close my account</button>
+            <div class="common-block-buttons">
+                <button class="common-button danger-button" type="submit">Delete data and close my account</button>
+            </div>
+            
         </form>
 </div>

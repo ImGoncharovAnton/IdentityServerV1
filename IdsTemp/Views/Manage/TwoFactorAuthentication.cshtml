@@ -14,39 +14,32 @@
         switch (Model.RecoveryCodesLeft)
         {
             case 0:
-                <div class="col-12">
-                    <div class="alert alert-danger">
-                        <strong>You have no recovery codes left</strong>
-                        <p>You must <a asp-action="GenerateRecoveryCodes">generate a new set of recovery codes</a> before you can log in with a recovery code</p>
-                    </div>
+                <div class="alert alert-danger">
+                    <strong>You have no recovery codes left</strong>
+                    <p>You must <a asp-action="GenerateRecoveryCodes">generate a new set of recovery codes</a> before you can log in with a recovery code</p>
                 </div>
                 break;
             case 1:
-                <div class="col-12">
-                    <div class="alert alert-danger">
-                        <strong>You have 1 recovery code left</strong>
-                        <p>You can generate a new set of recovery codes <a asp-action="GenerateRecoveryCodes">generate a new set of recovery codes</a></p>
-                    </div>
+                <div class="alert alert-danger">
+                    <strong>You have 1 recovery code left</strong>
+                    <p>You can generate a new set of recovery codes <a asp-action="GenerateRecoveryCodes">generate a new set of recovery codes</a></p>
                 </div>
                 break;
             case <= 3:
-                <div class="col-12">
-                    <div class="alert alert-warning">
-                        <strong>You have @Model.RecoveryCodesLeft.ToString() recovery codes left</strong>
-                        <p>You should <a asp-action="GenerateRecoveryCodes">generate a new set of recovery codes</a></p>
-                    </div>
+                <div class="alert alert-warning">
+                    <strong>You have @Model.RecoveryCodesLeft.ToString() recovery codes left</strong>
+                    <p>You should <a asp-action="GenerateRecoveryCodes">generate a new set of recovery codes</a></p>
                 </div>
                 break;
         }
 
-
-        <div class="flex-gap-1">
-            <a asp-action="Disable2FaWarning" class="btn btn-primary">Disable 2FA</a>
-            <a asp-action="GenerateRecoveryCodesWarning" class="btn btn-danger">Reset recovery codes</a>
+        <div class="common-block-buttons">
+            <a asp-action="Disable2FaWarning" class="common-button flex-cc">Disable 2FA</a>
+            <a asp-action="GenerateRecoveryCodesWarning" class="common-button flex-cc danger-button">Reset recovery codes</a>
             @if (Model.IsMachineRemembered)
             {
                 <form method="post" asp-controller="Manage" asp-action="ForgetTwoFactorClient">
-                    <button type="submit" class="btn btn-info">Forget this browser</button>
+                    <button type="submit" class="common-button back-button">Forget this browser</button>
                 </form>
             }
         </div>
@@ -55,15 +48,15 @@
     <div>
         <h4 class="common-heading">Authenticator app</h4>
 
-        <div class="flex-gap-1">
+        <div class="common-block-buttons">
             @if (!Model.HasAuthenticator)
             {
-                <a id="enable-authenticator" asp-action="EnableAuthenticator" class="btn btn-primary">Add authenticator app</a>
+                <a id="enable-authenticator" asp-action="EnableAuthenticator" class="common-button flex-cc">Add authenticator app</a>
             }
             else
             {
-                <a id="enable-authenticator" asp-action="EnableAuthenticator" class="btn btn-primary">Setup authenticator app</a>
-                <a id="reset-authenticator" asp-action="ResetAuthenticatorWarning" class="btn btn-danger">Reset authenticator app</a>
+                <a id="enable-authenticator" asp-action="EnableAuthenticator" class="common-button flex-cc">Setup authenticator app</a>
+                <a id="reset-authenticator" asp-action="ResetAuthenticatorWarning" class="common-button flex-cc danger-button">Reset authenticator app</a>
             }
         </div>
     </div>

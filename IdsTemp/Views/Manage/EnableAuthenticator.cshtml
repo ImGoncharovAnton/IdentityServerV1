@@ -9,7 +9,7 @@
 
 <h2 class="common-heading">@ViewData["Title"]</h2>
 
-<div class="admin-page">
+<div class="admin-page common-form">
     <h3 class="common-heading">To use an authenticator app go through the following steps:</h3>
     <ol>
         <li>
@@ -33,10 +33,10 @@
             <form method="post">
                 <div class="form-group">
                     <label asp-for="Code" class="control-label">Verification Code</label>
-                    <input asp-for="Code" class="form-control" autocomplete="off"/>
+                    <input asp-for="Code" class="common-input" autocomplete="off"/>
                     <span asp-validation-for="Code" class="text-danger"></span>
                 </div>
-                <button type="submit" class="btn btn-primary">Verify</button>
+                <button type="submit" class="common-button">Verify</button>
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             </form>
         </li>
